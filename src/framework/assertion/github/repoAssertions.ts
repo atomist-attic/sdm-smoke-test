@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-async function assertRepoExists(owner: string, name: string, opts: AssertionOptions): Promise<any> {
+import { RepoBranchTips } from "../../../typings/types";
+import Commit = RepoBranchTips.Commit;
+
+async function assertRepoExists(params: { owner: string, name: string, opts: AssertionOptions }): Promise<any> {
     return null;
 }
 
-async function getLastSha(owner: string, name: string): Promise<string> {
+async function newCommitSha(params: {
+    owner: string,
+    name: string,
+    branch: string,
+    opts: AssertionOptions,
+}): Promise<Commit> {
     return null;
 }

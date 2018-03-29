@@ -28,6 +28,7 @@ describe("test against existing project", () => {
         const handlerResult = await invokeCommandHandler(TestConfig,
             editorOneInvocation("affirmation", TestConfig.githubOrg, RepoToTest));
         assert(handlerResult.success);
+       //  assertRepoExists()
     }).timeout(100000);
 
 });
