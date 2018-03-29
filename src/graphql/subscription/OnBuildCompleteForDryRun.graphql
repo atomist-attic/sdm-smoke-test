@@ -1,0 +1,34 @@
+subscription OnBuildCompleteForDryRun {
+  Build {
+    buildId
+    buildUrl
+    compareUrl
+    name
+    status
+    commit {
+      sha
+      message
+      repo {
+        name
+        owner
+        gitHubId
+        allowRebaseMerge
+        channels {
+          team {
+            id
+          }
+          id
+        }
+      }
+      pushes {
+        branch
+      }
+      statuses {
+        context
+        description
+        state
+        targetUrl
+      }
+    }
+  }
+}
