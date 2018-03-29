@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

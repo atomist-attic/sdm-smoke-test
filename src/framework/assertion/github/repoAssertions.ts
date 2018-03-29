@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-
 async function assertRepoExists(owner: string, name: string, opts: AssertionOptions): Promise<any> {
-
+    return null;
 }
 
 async function getLastSha(owner: string, name: string): Promise<string> {

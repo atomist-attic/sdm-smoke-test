@@ -17,8 +17,8 @@
 import * as assert from "assert";
 import * as stringify from "json-stringify-safe";
 import "mocha";
-import { TestConfig } from "./fixture";
 import { invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
+import { TestConfig } from "./fixture";
 
 describe("basic thereness", () => {
 
