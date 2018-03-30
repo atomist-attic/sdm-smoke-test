@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import { logger } from "@atomist/automation-client";
 import { doWithRetry } from "@atomist/automation-client/util/retry";
 import { AssertOptions } from "../AssertOptions";
-import { logger } from "@atomist/automation-client";
 
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
