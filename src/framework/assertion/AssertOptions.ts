@@ -32,6 +32,8 @@ export class BuildingAssertOptions implements AssertOptions {
     public withRetries(retries: number): BuildingAssertOptions {
         return new BuildingAssertOptions(this.delayForMillis, this.allowMillis, {
             retries,
+            minTimeout: 1 * 1000,
+            maxTimeout: 3 * 1000,
         });
     }
 
