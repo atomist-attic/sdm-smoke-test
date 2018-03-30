@@ -42,7 +42,8 @@ export async function invokeCommandHandler(config: SmokeTestConfig,
     };
     logger.debug(`Hitting ${url} to test command ${invocation.name}`);
     const resp = await postToSdm(config, url, data);
-    assert(resp.data.success, "Affirmation handler should have succeeded");
+    assert(resp.data.code === 0,
+        "Command handler did not succeed. Returned: " + JSON.stringify(resp.data, null, 2));
     return resp.data;
 }
 
@@ -58,7 +59,7 @@ function postToSdm(config: SmokeTestConfig, relativePath: string, data: any) {
 
 function logResponse(url: string) {
     return (resp: AxiosResponse): AxiosResponse => {
-        logger.debug(`Response from ${url} was ${resp.status}`);
+        logger.debug(`Response from %s was %d, data %j`, url, resp.status, resp.data);
         return resp;
     };
 }
