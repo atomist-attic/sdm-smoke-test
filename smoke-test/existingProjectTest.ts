@@ -21,7 +21,7 @@ import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import * as assert from "power-assert";
-import { delayFor, seconds } from "../src/framework/assertion/AssertOptions";
+import { allow, delayFor, seconds } from "../src/framework/assertion/AssertOptions";
 import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
 import { GitRemoteAssertions } from "../src/framework/assertion/GitRemoteAssertions";
 import { waitMillis } from "../src/framework/assertion/util/wait";
@@ -35,7 +35,7 @@ describe("test against existing project", () => {
 
     const gitRemoteHelper: GitHubAssertions = new GitHubAssertions(config.credentials);
 
-    it("changes readme", async () => {
+    it("changes readme and judges immaterial", async () => {
         const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch: "master"});
 
         const previousTipOfMaster = await gitRemoteHelper.lastCommit(repo);
@@ -61,9 +61,12 @@ describe("test against existing project", () => {
 
         // Now verify context
         const status = await gitRemoteHelper.requiredStatus({
-            ...repo,
-            sha: gitStatus.sha,
-        } as GitHubRepoRef, s => s.context.includes("immaterial"));
+                ...repo,
+                sha: gitStatus.sha,
+            } as GitHubRepoRef,
+            s => s.context.includes("immaterial"),
+            allow(seconds(40)).withRetries(10),
+        );
         logger.info("Found required status %j", status);
     }).timeout(100000);
 

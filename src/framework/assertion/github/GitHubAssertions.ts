@@ -61,6 +61,7 @@ export class GitHubAssertions implements GitRemoteAssertions {
         assert(!!id.sha, "Sha must be provided in " + JSON.stringify(id));
         return doWithOptions(
             () => listStatuses(this.credentials.token, id as GitHubRepoRef),
+            `get statuses for ${id.sha}`,
             opts,
         );
     }
@@ -77,6 +78,7 @@ export class GitHubAssertions implements GitRemoteAssertions {
     public clone(id: RemoteRepoRef, opts?: AssertOptions): Promise<GitProject> {
         return doWithOptions(
             () => GitCommandGitProject.cloned(this.credentials, id),
+            `clone ${JSON.stringify(id)})`,
             opts);
     }
 
@@ -88,6 +90,7 @@ export class GitHubAssertions implements GitRemoteAssertions {
             logger.debug(`Request to '${url}' to get commits`);
             const resp = await doWithOptions(
                 () => axios.get(url, authHeaders(this.credentials.token)),
+                `get commits for ${JSON.stringify(id)} d `,
                 opts,
             );
 
@@ -109,10 +112,12 @@ export class GitHubAssertions implements GitRemoteAssertions {
     }
 }
 
-function  authHeaders(token: string): AxiosRequestConfig {
+function authHeaders(token: string): AxiosRequestConfig {
     return token ? {
             headers: {
-                Authorization: `token ${token}`,
+                Authorization:
+                    `token ${token}`
+                ,
             },
         }
         : {};

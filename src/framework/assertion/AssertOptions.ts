@@ -14,49 +14,37 @@
  * limitations under the License.
  */
 
-export interface AssertOptions {
+import { RetryOptions } from "@atomist/automation-client/util/retry";
+
+export interface AssertOptions extends Partial<RetryOptions> {
     delayForMillis?: number;
     allowMillis?: number;
 }
 
-export function delayFor(delayForMillis: number) {
-    return {
-        delayForMillis,
-        thenAllow(allowMillis: number): AssertOptions {
-            return allow(allowMillis, delayForMillis);
-        },
-    };
+export class BuildingAssertOptions implements AssertOptions {
+    constructor(public delayForMillis: number, public allowMillis: number, public retryOptions: Partial<RetryOptions> = {}) {
+    }
+
+    public thenAllow(allowMillis: number): BuildingAssertOptions {
+        return new BuildingAssertOptions(this.delayForMillis, allowMillis, this.retryOptions);
+    }
+
+    public withRetries(retries: number): BuildingAssertOptions {
+        return new BuildingAssertOptions(this.delayForMillis, this.allowMillis, {
+            retries,
+        });
+    }
+
 }
 
-export function allow(allowMillis: number, delayForMillis: number = 0): AssertOptions {
-    return {
-        delayForMillis,
-        allowMillis,
-    };
+export function delayFor(delayForMillis: number): BuildingAssertOptions {
+    return new BuildingAssertOptions(delayForMillis, undefined, undefined);
+}
+
+export function allow(allowMillis: number, delayForMillis: number = 0): BuildingAssertOptions {
+    return new BuildingAssertOptions(delayForMillis, allowMillis);
 }
 
 export function seconds(n: number) {
     return 1000 * n;
 }
-
-// export class AssertionBuilder {
-//
-//     public options: AssertOptions;
-//
-//     constructor(public n: number) {
-//         this.options = {
-//             withinMillis: n,
-//         };
-//     }
-//
-//     get seconds(): this {
-//         this.options = {
-//             withinMillis: this.n * 1000,
-//         };
-//         return this;
-//     }
-// }
-
-// export function within(n: number): AssertionBuilder {
-//     return new AssertionBuilder(n);
-// }
