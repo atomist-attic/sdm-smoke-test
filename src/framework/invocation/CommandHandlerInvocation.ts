@@ -17,10 +17,10 @@
 import { logger } from "@atomist/automation-client";
 import { Arg, Secret } from "@atomist/automation-client/internal/invoker/Payload";
 
+import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import axios from "axios";
 import * as _ from "lodash";
 import { automationServerAuthHeaders, SmokeTestConfig } from "../config";
-import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 
 export interface CommandHandlerInvocation {
     name: string;

@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-import { RepoBranchTips } from "../../../typings/types";
+import { logger } from "@atomist/automation-client";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import Commit = RepoBranchTips.Commit;
 import { AxiosRequestConfig } from "axios";
-import { logger } from "@atomist/automation-client";
 import axios from "axios";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { RepoBranchTips } from "../../../typings/types";
 import { Dated, GitRemoteAssertions } from "../GitRemoteAssertions";
-import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 
 import * as assert from "power-assert";
 
 import * as _ from "lodash";
 
-import { AssertOptions, delayFor } from "../AssertOptions";
-import { blowUpInMillis, doWithTimeout, waitMillis } from "../util/wait";
-import { GitProject } from "@atomist/automation-client/project/git/GitProject";
-import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import {
     ProjectOperationCredentials,
-    TokenCredentials
+    TokenCredentials,
 } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
+import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
+import { GitProject } from "@atomist/automation-client/project/git/GitProject";
+import { AssertOptions, delayFor } from "../AssertOptions";
+import { blowUpInMillis, doWithTimeout, waitMillis } from "../util/wait";
 
 export class GitHubAssertions implements GitRemoteAssertions {
 

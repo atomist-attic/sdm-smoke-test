@@ -17,14 +17,14 @@
 import "mocha";
 import { TestConfig } from "./fixture";
 
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import * as assert from "power-assert";
-import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
+import { delayFor, seconds } from "../src/framework/assertion/AssertOptions";
 import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
 import { GitRemoteAssertions } from "../src/framework/assertion/GitRemoteAssertions";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { delayFor, seconds } from "../src/framework/assertion/AssertOptions";
 import { waitMillis } from "../src/framework/assertion/util/wait";
-import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
+import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
 
 const RepoToTest = "losgatos1";
 

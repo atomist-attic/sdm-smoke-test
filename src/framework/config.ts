@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { AxiosRequestConfig } from "axios";
 import axios from "axios";
-import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 
 export interface SmokeTestConfig {
     atomistTeamId: string;

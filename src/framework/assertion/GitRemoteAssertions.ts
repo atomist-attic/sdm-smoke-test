@@ -26,7 +26,7 @@ export interface Dated {
 
 export interface GitRemoteAssertions {
 
-    assertRepoExists(params: { owner: string, name: string, opts?: AssertOptions }): Promise<any>
+    assertRepoExists(params: { owner: string, name: string, opts?: AssertOptions }): Promise<any>;
 
     lastCommit(id: RemoteRepoRef,
                opts?: AssertOptions): Promise<Commit & Dated>;
