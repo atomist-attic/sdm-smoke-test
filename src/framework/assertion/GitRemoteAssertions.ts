@@ -30,7 +30,7 @@ export interface GitRemoteAssertions {
     assertRepoExists(params: { owner: string, name: string, opts?: AssertOptions }): Promise<any>;
 
     lastCommit(id: RemoteRepoRef,
-               opts?: AssertOptions): Promise<Commit & Dated>;
+               opts?: AssertOptions): Promise<(Commit & Dated) | undefined>;
 
     clone(id: RemoteRepoRef,
           opts?: AssertOptions): Promise<GitProject>;

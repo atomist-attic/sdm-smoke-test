@@ -81,31 +81,35 @@ export class GitHubAssertions implements GitRemoteAssertions {
     }
 
     public async lastCommit(id: RemoteRepoRef,
-                            opts?: AssertOptions): Promise<Commit & Dated> {
-        assert(!!id.branch, "Branch must be provided in " + JSON.stringify(id));
-        const url = `${(id as GitHubRepoRef).apiBase}/repos/${id.owner}/${id.repo}/branches/${id.branch}`;
-        logger.debug(`Request to '${url}' to get commits`);
-        const resp = await doWithOptions(
-            () => axios.get(url, authHeaders(this.credentials.token)),
-            opts,
-        );
+                            opts?: AssertOptions): Promise<(Commit & Dated) | undefined> {
+        try {
+            assert(!!id.branch, "Branch must be provided in " + JSON.stringify(id));
+            const url = `${(id as GitHubRepoRef).apiBase}/repos/${id.owner}/${id.repo}/branches/${id.branch}`;
+            logger.debug(`Request to '${url}' to get commits`);
+            const resp = await doWithOptions(
+                () => axios.get(url, authHeaders(this.credentials.token)),
+                opts,
+            );
 
-        const ghcommit = resp.data.commit;
-        const dateString = new Date(_.get(ghcommit, "commit.author.date"));
-        logger.debug("Commit is %j", resp.data);
-        const date = new Date(dateString);
-        return {
-            sha: ghcommit.sha,
-            message: ghcommit.commit.message,
-            committer: {
-                login: ghcommit.committer.login,
-            },
-            date,
-        };
+            const ghcommit = resp.data.commit;
+            const dateString = new Date(_.get(ghcommit, "commit.author.date"));
+            logger.debug("Commit is %j", resp.data);
+            const date = new Date(dateString);
+            return {
+                sha: ghcommit.sha,
+                message: ghcommit.commit.message,
+                committer: {
+                    login: ghcommit.committer.login,
+                },
+                date,
+            };
+        } catch (err) {
+            return undefined;
+        }
     }
 }
 
-function authHeaders(token: string): AxiosRequestConfig {
+function  authHeaders(token: string): AxiosRequestConfig {
     return token ? {
             headers: {
                 Authorization: `token ${token}`,
