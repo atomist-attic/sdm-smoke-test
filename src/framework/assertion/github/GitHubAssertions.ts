@@ -29,11 +29,11 @@ import {
     ProjectOperationCredentials,
     TokenCredentials,
 } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
-import { AssertOptions } from "../AssertOptions";
-import { doWithOptions, waitMillis } from "../util/wait";
+import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import Commit = RepoBranchTips.Commit;
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
-import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
+import { AssertOptions } from "../AssertOptions";
+import { doWithOptions, waitMillis } from "../util/wait";
 
 export type State = "error" | "failure" | "pending" | "success";
 
