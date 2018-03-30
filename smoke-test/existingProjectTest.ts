@@ -121,12 +121,8 @@ describe("test against existing Java project", () => {
             // logger.info(`Found [${customAffirmation}] in new README`);
 
             // Now verify context
-            const buildStatus = await gitRemoteHelper.waitForStatusOf({
-                    ...repo,
-                    sha: gitStatus.sha,
-                } as GitHubRepoRef,
+            const buildStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
                 s => s.context.includes("build"),
-                "success",
                 allow(seconds(80)).withRetries(10),
             );
             logger.info("Found required build status %j", status);

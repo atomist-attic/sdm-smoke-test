@@ -82,6 +82,7 @@ export class GitHubAssertions implements GitRemoteAssertions {
                                  state: State,
                                  opts?: AssertOptions): Promise<Status> {
         return doWithOptions(async () => {
+            // TODO fail finally if we get a failure status
                 logger.info(`Looking for status satisfying [${test}] on commit ${id.sha}; options=${JSON.stringify(opts)}...`);
                 const statuses = await this.statuses(id);
                 const it = statuses.find(s => test(s) && s.state === state);
