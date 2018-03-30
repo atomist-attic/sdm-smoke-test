@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
+import { HandlerResult, logger } from "@atomist/automation-client";
 import { Arg, Secret } from "@atomist/automation-client/internal/invoker/Payload";
 
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import axios from "axios";
 import * as _ from "lodash";
 import { automationServerAuthHeaders, SmokeTestConfig } from "../config";
+
+import * as assert from "power-assert";
 
 export interface CommandHandlerInvocation {
     name: string;
@@ -30,7 +32,7 @@ export interface CommandHandlerInvocation {
 }
 
 export async function invokeCommandHandler(config: SmokeTestConfig,
-                                           invocation: CommandHandlerInvocation) {
+                                           invocation: CommandHandlerInvocation): Promise<HandlerResult> {
     const url = `${config.baseEndpoint}/command/${_.kebabCase(invocation.name)}`;
     const data = {
         parameters: invocation.parameters,
@@ -41,6 +43,7 @@ export async function invokeCommandHandler(config: SmokeTestConfig,
     logger.debug(`Hitting ${url} to test command ${invocation.name} with payload ${JSON.stringify(data)}`);
     const resp = await axios.post(url, data, automationServerAuthHeaders(config));
     logger.debug(`Response from ${url} was ${resp.status}`);
+    assert(resp.data.success, "Affirmation handler should have succeeded");
     return resp.data;
 }
 

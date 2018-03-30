@@ -43,11 +43,11 @@ export async function blowUpInMillis(what: string, n: number): Promise<any> {
 export async function doWithOptions<T>(what: () => Promise<T>,
                                        description: string,
                                        opts: AssertOptions): Promise<T> {
-    const withRetryIfNeeded: () => Promise<T> = (!!opts && !!opts.retries) ?
+    const withRetryIfNeeded: () => Promise<T> = !!opts && !!opts.retries ?
         () => doWithRetry(what, description, opts) :
         what;
     logger.info("doWithOptions: %s - %j", description, opts);
-    // logger.info("Code: %s", withRetryIfNeeded.toString());
+    logger.info("Code: %s", withRetryIfNeeded.toString());
     if (!!opts && !!opts.delayForMillis) {
         await wait(opts.delayForMillis);
     }

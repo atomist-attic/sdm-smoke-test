@@ -22,25 +22,26 @@ export interface AssertOptions extends Partial<RetryOptions> {
 }
 
 export class BuildingAssertOptions implements AssertOptions {
-    constructor(public delayForMillis: number, public allowMillis: number, public retryOptions: Partial<RetryOptions> = {}) {
+
+    constructor(public delayForMillis: number, public allowMillis: number) {
     }
 
     public thenAllow(allowMillis: number): BuildingAssertOptions {
-        return new BuildingAssertOptions(this.delayForMillis, allowMillis, this.retryOptions);
+        return new BuildingAssertOptions(this.delayForMillis, allowMillis);
     }
 
     public withRetries(retries: number): BuildingAssertOptions {
-        return new BuildingAssertOptions(this.delayForMillis, this.allowMillis, {
-            retries,
-            minTimeout: 1 * 1000,
-            maxTimeout: 3 * 1000,
-        });
+        const bao: AssertOptions = new BuildingAssertOptions(this.delayForMillis, this.allowMillis);
+        bao.retries = retries;
+        bao.minTimeout = 1 * 1000;
+        bao.maxTimeout = 3 * 1000;
+        return bao as BuildingAssertOptions;
     }
 
 }
 
 export function delayFor(delayForMillis: number): BuildingAssertOptions {
-    return new BuildingAssertOptions(delayForMillis, undefined, undefined);
+    return new BuildingAssertOptions(delayForMillis, undefined);
 }
 
 export function allow(allowMillis: number, delayForMillis: number = 0): BuildingAssertOptions {

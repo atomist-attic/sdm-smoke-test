@@ -42,15 +42,13 @@ describe("test against existing Java project", () => {
             const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
             logger.info(`Invoking handler with [${customAffirmation}]...`);
 
-            const handlerResult = await invokeCommandHandler(config,
+            await invokeCommandHandler(config,
                 editorOneInvocation("affirmation", repo,
                     // TODO simplify parameter passing
                     [{name: "customAffirmation", value: customAffirmation}]));
-            assert(handlerResult.success, "Affirmation handler should have succeeded");
             logger.info("Handler returned. Waiting for GitHub...");
 
-            await wait(seconds(5));
-            const currentProject = await gitRemoteHelper.clone(repo);
+            const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
             const newReadme = currentProject.findFileSync("README.md").getContentSync();
             const gitStatus = await currentProject.gitStatus();
             assert(gitStatus.sha !== previousTipOfMaster.sha);
@@ -71,24 +69,22 @@ describe("test against existing Java project", () => {
         }).timeout(100000);
 
         it("changes Java on a branch and sees local deployment", async () => {
-            const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch: "master"});
             const branch = "test-" + new Date().getTime();
+            const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch});
 
             const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
             logger.info(`Invoking handler with [${customAffirmation}]...`);
 
-            const handlerResult = await invokeCommandHandler(config,
-                editorOneInvocation("affirmation", repo,
+            await invokeCommandHandler(config,
+                editorOneInvocation("javaAffirmation", repo,
                     // TODO simplify parameter passing: Do we have a type
                     [
-                        {name: "javaAffirmation", value: customAffirmation},
+                        {name: "customAffirmation", value: customAffirmation},
                         {name: "branch", value: branch},
                     ]));
-            assert(handlerResult.success, "Affirmation handler should have succeeded");
             logger.info("Handler returned. Waiting for GitHub...");
 
-            await wait(seconds(5));
-            const currentProject = await gitRemoteHelper.clone(repo);
+            const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
             // const newReadme = currentProject.findFileSync("README.md").getContentSync();
             const gitStatus = await currentProject.gitStatus();
             // assert(newReadme.includes(customAffirmation));
