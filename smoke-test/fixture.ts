@@ -22,11 +22,15 @@ export const TestConfig: SmokeTestConfig = {
     baseEndpoint: "http://localhost:2866",
 
     user: "admin",
-    password: process.env.LOCAL_ATOMIST_ADMIN_PASSWORD,
+    password: process.env.LOCAL_ATOMIST_ADMIN_PASSWORD || throwError("Please define LOCAL_ATOMIST_ADMIN_PASSWORD"),
 
     githubOrg: "spring-team",
 
     credentials: {
-        token: process.env.GITHUB_TOKEN,
+        token: process.env.GITHUB_TOKEN || throwError("Please define GITHUB_TOKEN"),
     },
 };
+
+function throwError(message: string): string {
+    throw new Error(message);
+}
