@@ -19,20 +19,21 @@ import { allow, AssertOptions, seconds } from "../AssertOptions";
 import { GitHubAssertions, Status } from "./GitHubAssertions";
 
 /**
- * Block for a certain period of time for immaterial status
+ * Block for a certain period of time for a successful status
  * @param {GitHubAssertions} gitRemoteHelper
  * @param {string} owner
  * @param {string} repo
  * @param {string} sha
  * @return {Promise<Status>}
  */
-export function waitForImmaterialSuccess(gitRemoteHelper: GitHubAssertions,
-                                         owner: string, repo: string,
-                                         sha: string,
-                                         opts?: AssertOptions): Promise<Status> {
+export function waitForSuccessOf(gitRemoteHelper: GitHubAssertions,
+                                 owner: string, repo: string,
+                                 sha: string,
+                                 test: (s: Status) => boolean,
+                                 opts?: AssertOptions): Promise<Status> {
     return gitRemoteHelper.waitForStatusOf(
         new GitHubRepoRef(owner, repo, sha),
-        s => s.context.includes("immaterial"),
+        test,
         "success",
         opts || allow(seconds(40)).withRetries(10),
     );

@@ -22,8 +22,8 @@ import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitH
 import * as assert from "power-assert";
 import { allow, seconds } from "../src/framework/assertion/AssertOptions";
 import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
-import { waitForImmaterialSuccess } from "../src/framework/assertion/github/statusUtils";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
+import { waitForSuccessOf } from "../src/framework/assertion/github/statusUtils";
 
 const RepoToTest = "losgatos1";
 
@@ -59,7 +59,8 @@ describe("test against existing Java project", () => {
                 logger.info(`Found [${customAffirmation}] in new README`);
 
                 // Now verify context
-                const immaterialStatus = waitForImmaterialSuccess(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha);
+                const immaterialStatus = waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
+                    s => s.context.includes("immaterial"));
                 logger.info("Found required status %j", immaterialStatus);
             }).timeout(100000);
 
@@ -86,7 +87,8 @@ describe("test against existing Java project", () => {
                 logger.info(`Found [${customAffirmation}] in new README`);
 
                 // Now verify context
-                const immaterialStatus = waitForImmaterialSuccess(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha);
+                const immaterialStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
+                    s => s.context.includes("immaterial"));
                 logger.info("Found required immaterial status %j", immaterialStatus);
             }).timeout(100000);
 
