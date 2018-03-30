@@ -19,6 +19,7 @@ import { RepoBranchTips } from "../../typings/types";
 
 import { AssertOptions } from "./AssertOptions";
 import Commit = RepoBranchTips.Commit;
+import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 
 export interface Dated {
     date: Date;
@@ -30,4 +31,7 @@ export interface GitRemoteAssertions {
 
     lastCommit(id: RemoteRepoRef,
                opts?: AssertOptions): Promise<Commit & Dated>;
+
+    clone(id: RemoteRepoRef,
+          opts?: AssertOptions): Promise<GitProject>;
 }

@@ -25,6 +25,7 @@ import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssert
 import { GitRemoteAssertions } from "../src/framework/assertion/GitRemoteAssertions";
 import { waitMillis } from "../src/framework/assertion/util/wait";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
+import { logger } from "@atomist/automation-client";
 
 const RepoToTest = "losgatos1";
 
@@ -32,31 +33,38 @@ const config = TestConfig;
 
 describe("test against existing project", () => {
 
-    const gitRemote: GitRemoteAssertions = new GitHubAssertions(config.credentials);
+    const gitRemoteHelper: GitHubAssertions = new GitHubAssertions(config.credentials);
 
     it("changes readme", async () => {
         const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch: "master"});
 
-        const previousTipOfMaster = await gitRemote.lastCommit(repo);
+        const previousTipOfMaster = await gitRemoteHelper.lastCommit(repo);
 
         const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
-        console.log(`Invoking handler with [${customAffirmation}]...`);
+        logger.info(`Invoking handler with [${customAffirmation}]...`);
 
         const handlerResult = await invokeCommandHandler(config,
             editorOneInvocation("affirmation", repo,
                 // TODO simplify parameter passing
                 [{name: "customAffirmation", value: customAffirmation}]));
         assert(handlerResult.success, "Affirmation handler should have succeeded");
-        console.log("Handler returned. Waiting for GitHub...");
+        logger.info("Handler returned. Waiting for GitHub...");
 
         await waitMillis(seconds(5));
-        const currentProject = await GitCommandGitProject.cloned(config.credentials, repo);
+        const currentProject = await gitRemoteHelper.clone(repo);
         const newReadme = currentProject.findFileSync("README.md").getContentSync();
-        const status = await currentProject.gitStatus();
-        assert(status.sha !== previousTipOfMaster.sha);
-        console.log(`Verified new sha ${status.sha} is not old of ${previousTipOfMaster.sha}`);
+        const gitStatus = await currentProject.gitStatus();
+        assert(gitStatus.sha !== previousTipOfMaster.sha);
+        logger.info(`Verified new sha ${gitStatus.sha} is not old of ${previousTipOfMaster.sha}`);
         assert(newReadme.includes(customAffirmation));
-        console.log(`Found [${customAffirmation}] in new README`);
+        logger.info(`Found [${customAffirmation}] in new README`);
+
+        // Now verify context
+        const status = await gitRemoteHelper.requiredStatus({
+            ...repo,
+            sha: gitStatus.sha,
+        } as GitHubRepoRef, s => s.context.includes("immaterial"));
+        logger.info("Found required status %j", status);
     }).timeout(100000);
 
 });

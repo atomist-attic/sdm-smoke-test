@@ -38,7 +38,10 @@ export async function blowUpInMillis(what: string, n: number): Promise<any> {
     throw new Error(`${what} timed out after ${n} milliseconds`);
 }
 
-export async function doWithTimeout<T>(what: () => T, opts: AssertOptions): Promise<T> {
+export async function doWithOptions<T>(what: () => Promise<T> | T, opts: AssertOptions): Promise<T> {
+    if (!!opts && !!opts.delayForMillis) {
+        await waitMillis(opts.delayForMillis);
+    }
     return !!opts && !!opts.allowMillis ?
         Promise.race([
             blowUpInMillis("Get commit", opts.allowMillis),
