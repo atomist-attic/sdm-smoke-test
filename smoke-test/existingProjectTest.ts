@@ -22,8 +22,8 @@ import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitH
 import * as assert from "power-assert";
 import { allow, seconds } from "../src/framework/assertion/AssertOptions";
 import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
-import { wait } from "../src/framework/assertion/util/wait";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
+import { waitForImmaterialSuccess } from "../src/framework/assertion/github/statusUtils";
 
 const RepoToTest = "losgatos1";
 
@@ -35,38 +35,66 @@ describe("test against existing Java project", () => {
 
     describe("HTTP service", () => {
 
-        it("changes readme and judges immaterial", async () => {
-            const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch: "master"});
-            const previousTipOfMaster = await gitRemoteHelper.lastCommit(repo);
+        describe("immaterial changes", () => {
 
-            const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
-            logger.info(`Invoking handler with [${customAffirmation}]...`);
+            it("changes readme and judges immaterial", async () => {
+                const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch: "master"});
+                const previousTipOfMaster = await gitRemoteHelper.lastCommit(repo);
 
-            await invokeCommandHandler(config,
-                editorOneInvocation("affirmation", repo,
-                    // TODO simplify parameter passing
-                    [{name: "customAffirmation", value: customAffirmation}]));
-            logger.info("Handler returned. Waiting for GitHub...");
+                const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
+                logger.info(`Invoking handler with [${customAffirmation}]...`);
 
-            const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
-            const newReadme = currentProject.findFileSync("README.md").getContentSync();
-            const gitStatus = await currentProject.gitStatus();
-            assert(gitStatus.sha !== previousTipOfMaster.sha);
-            logger.info(`Verified new sha ${gitStatus.sha} is not old of ${previousTipOfMaster.sha}`);
-            assert(newReadme.includes(customAffirmation));
-            logger.info(`Found [${customAffirmation}] in new README`);
+                await invokeCommandHandler(config,
+                    editorOneInvocation("affirmation", repo,
+                        // TODO simplify parameter passing
+                        [{name: "customAffirmation", value: customAffirmation}]));
+                logger.info("Handler returned. Waiting for GitHub...");
 
-            // Now verify context
-            const immaterialStatus = await gitRemoteHelper.waitForStatusOf({
-                    ...repo,
-                    sha: gitStatus.sha,
-                } as GitHubRepoRef,
-                s => s.context.includes("immaterial"),
-                "success",
-                allow(seconds(40)).withRetries(10),
-            );
-            logger.info("Found required status %j", immaterialStatus);
-        }).timeout(100000);
+                const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
+                const newReadme = currentProject.findFileSync("README.md").getContentSync();
+                const gitStatus = await currentProject.gitStatus();
+                assert(gitStatus.sha !== previousTipOfMaster.sha);
+                logger.info(`Verified new sha ${gitStatus.sha} is not old of ${previousTipOfMaster.sha}`);
+                assert(newReadme.includes(customAffirmation));
+                logger.info(`Found [${customAffirmation}] in new README`);
+
+                // Now verify context
+                const immaterialStatus = waitForImmaterialSuccess(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha);
+                logger.info("Found required status %j", immaterialStatus);
+            }).timeout(100000);
+
+            it("changes README on a branch and judges immaterial", async () => {
+                const branch = "test-" + new Date().getTime();
+                const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch});
+
+                const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
+                logger.info(`Invoking handler with [${customAffirmation}]...`);
+
+                await invokeCommandHandler(config,
+                    editorOneInvocation("affirmation", repo,
+                        // TODO simplify parameter passing: Do we have a type
+                        [
+                            {name: "customAffirmation", value: customAffirmation},
+                            {name: "branch", value: branch},
+                        ]));
+                logger.info("Handler returned. Waiting for GitHub...");
+
+                const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
+                const newReadme = currentProject.findFileSync("README.md").getContentSync();
+                const gitStatus = await currentProject.gitStatus();
+                assert(newReadme.includes(customAffirmation));
+                logger.info(`Found [${customAffirmation}] in new README`);
+
+                // Now verify context
+                const immaterialStatus = waitForImmaterialSuccess(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha);
+                logger.info("Found required immaterial status %j", immaterialStatus);
+            }).timeout(100000);
+
+        });
+
+    });
+
+    describe("material changes", () => {
 
         it("changes Java on a branch and sees local deployment", async () => {
             const branch = "test-" + new Date().getTime();
@@ -107,8 +135,8 @@ describe("test against existing Java project", () => {
 
     });
 
-    describe("library", () => {
-        // TODO
-    });
+});
 
+describe("library", () => {
+    // TODO
 });
