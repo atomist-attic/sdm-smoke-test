@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { allow, AssertOptions, seconds } from "../AssertOptions";
 import { GitHubAssertions, Status } from "./GitHubAssertions";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 
 /**
  * Block for a certain period of time for immaterial status

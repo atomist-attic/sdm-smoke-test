@@ -22,8 +22,8 @@ import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitH
 import * as assert from "power-assert";
 import { allow, seconds } from "../src/framework/assertion/AssertOptions";
 import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
-import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
 import { waitForImmaterialSuccess } from "../src/framework/assertion/github/statusUtils";
+import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
 
 const RepoToTest = "losgatos1";
 
