@@ -25,4 +25,8 @@ export const TestConfig: SmokeTestConfig = {
     password: process.env.LOCAL_ATOMIST_ADMIN_PASSWORD,
 
     githubOrg: "spring-team",
+
+    credentials: {
+        token: process.env.GITHUB_TOKEN,
+    },
 };

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { AssertOptions } from "../AssertOptions";
+
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -25,4 +27,22 @@ async function sleep(fn, ...args) {
 
 export async function waitSeconds(n: number) {
     await timeout(n * 1000);
+}
+
+export async function waitMillis(n: number) {
+    await timeout(n);
+}
+
+export async function blowUpInMillis(what: string, n: number): Promise<any> {
+    await waitMillis(n);
+    throw new Error(`${what} timed out after ${n} milliseconds`);
+}
+
+export async function doWithTimeout<T>(what: () => T, opts: AssertOptions): Promise<T> {
+    return !!opts && !!opts.allowMillis ?
+        Promise.race([
+            blowUpInMillis("Get commit", opts.allowMillis),
+            what(),
+        ]) :
+        what();
 }

@@ -19,16 +19,44 @@ import { TestConfig } from "./fixture";
 
 import * as assert from "power-assert";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
+import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
+import { GitRemoteAssertions } from "../src/framework/assertion/GitRemoteAssertions";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { delayFor, seconds } from "../src/framework/assertion/AssertOptions";
+import { waitMillis } from "../src/framework/assertion/util/wait";
+import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 
 const RepoToTest = "losgatos1";
 
+const config = TestConfig;
+
 describe("test against existing project", () => {
 
+    const gitRemote: GitRemoteAssertions = new GitHubAssertions(config.credentials);
+
     it("changes readme", async () => {
-        const handlerResult = await invokeCommandHandler(TestConfig,
-            editorOneInvocation("affirmation", TestConfig.githubOrg, RepoToTest));
-        assert(handlerResult.success);
-       //  assertRepoExists()
+        const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch: "master"});
+
+        const previousTipOfMaster = await gitRemote.lastCommit(repo);
+
+        const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
+        console.log(`Invoking handler with [${customAffirmation}]...`);
+
+        const handlerResult = await invokeCommandHandler(config,
+            editorOneInvocation("affirmation", repo,
+                // TODO simplify parameter passing
+                [{name: "customAffirmation", value: customAffirmation}]));
+        assert(handlerResult.success, "Affirmation handler should have succeeded");
+        console.log("Handler returned. Waiting for GitHub...");
+
+        await waitMillis(seconds(5));
+        const currentProject = await GitCommandGitProject.cloned(config.credentials, repo);
+        const newReadme = currentProject.findFileSync("README.md").getContentSync();
+        const status = await currentProject.gitStatus();
+        assert(status.sha !== previousTipOfMaster.sha);
+        console.log(`Verified new sha ${status.sha} is not old of ${previousTipOfMaster.sha}`);
+        assert(newReadme.includes(customAffirmation));
+        console.log(`Found [${customAffirmation}] in new README`);
     }).timeout(100000);
 
 });

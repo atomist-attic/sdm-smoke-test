@@ -20,6 +20,7 @@ import { Arg, Secret } from "@atomist/automation-client/internal/invoker/Payload
 import axios from "axios";
 import * as _ from "lodash";
 import { automationServerAuthHeaders, SmokeTestConfig } from "../config";
+import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 
 export interface CommandHandlerInvocation {
     name: string;
@@ -37,24 +38,21 @@ export async function invokeCommandHandler(config: SmokeTestConfig,
         secrets: invocation.secrets,
         command: invocation.name,
     };
-    logger.info(`Hitting ${url} to test command ${invocation.name} with payload ${JSON.stringify(data)}`);
+    logger.debug(`Hitting ${url} to test command ${invocation.name} with payload ${JSON.stringify(data)}`);
     const resp = await axios.post(url, data, automationServerAuthHeaders(config));
-
-    // tslint:disable-next-line:no-console
-    console.log("RESP was " + resp.status);
+    logger.debug(`Response from ${url} was ${resp.status}`);
     return resp.data;
 }
 
 export function editorOneInvocation(editorCommandName: string,
-                                    owner: string,
-                                    repo: string,
+                                    rr: RemoteRepoRef,
                                     parameters: Arg[] = []): CommandHandlerInvocation {
     return {
         name: editorCommandName,
         parameters,
         mappedParameters: [
-            {name: "targets.owner", value: owner },
-            {name: "targets.repo", value: repo},
+            {name: "targets.owner", value: rr.owner },
+            {name: "targets.repo", value: rr.repo},
         ],
         secrets: [
             {uri: "github://user_token?scopes=repo,user:email,read:user", value: process.env.GITHUB_TOKEN},

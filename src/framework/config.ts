@@ -16,6 +16,7 @@
 
 import { AxiosRequestConfig } from "axios";
 import axios from "axios";
+import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 
 export interface SmokeTestConfig {
     atomistTeamId: string;
@@ -26,6 +27,8 @@ export interface SmokeTestConfig {
     password: string;
 
     githubOrg: string;
+
+    credentials: ProjectOperationCredentials;
 }
 
 export function automationServerAuthHeaders(config: SmokeTestConfig): AxiosRequestConfig {
