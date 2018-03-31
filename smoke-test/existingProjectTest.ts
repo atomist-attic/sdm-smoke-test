@@ -24,8 +24,9 @@ import { allow, seconds } from "../src/framework/assertion/AssertOptions";
 import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
 import { waitForSuccessOf } from "../src/framework/assertion/github/statusUtils";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
-import { editOne } from "@atomist/automation-client/operations/edit/editAll";
-import { BranchCommit, isBranchCommit } from "@atomist/automation-client/operations/edit/editModes";
+import { BranchCommit } from "@atomist/automation-client/operations/edit/editModes";
+import { edit } from "../src/framework/assertion/util/edit";
+import { verifyGet } from "../src/framework/assertion/util/endpoint";
 
 const RepoToTest = "losgatos1";
 
@@ -100,12 +101,12 @@ describe("test against existing Java project", () => {
 
                 const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
 
-                await editOne(null, config.credentials,
+                await edit(config.credentials,
+                    master,
+                    {branch, message: "Squirrels"} as BranchCommit,
                     async p => p.addFile(
                         "src/main/java/Thing.java",
-                        `// ${customAffirmation}\n// ${branch}\npublic class Thing {}`),
-                    {branch, message: "Squirrels"} as BranchCommit,
-                    master);
+                        `// ${customAffirmation}\n// ${branch}\npublic class Thing {}`),);
 
                 logger.info("Edit made. Waiting for GitHub...");
                 const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch});
@@ -114,14 +115,18 @@ describe("test against existing Java project", () => {
                 const gitStatus = await currentProject.gitStatus();
 
                 // Now verify context
-                const buildStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
-                    s => s.context.includes("build"),
+                const deployStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
+                    s => s.context.includes("deploy"),
                     allow(seconds(80)).withRetries(10),
                 );
-                logger.info("Found required build status %j", status);
-                assert(buildStatus.state === "success");
+                assert(deployStatus.state === "success");
+                const endpointStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
+                    s => s.context.includes("endpoint"),
+                    allow(seconds(5)).withRetries(2),
+                );
 
-                // TODO connect to local endpoint
+                assert(!!endpointStatus.target_url, "Target URL should be set on endpoint");
+                const resp = await verifyGet(endpointStatus.target_url);
             }).timeout(100000);
 
         });

@@ -33,7 +33,7 @@ import { GitCommandGitProject } from "@atomist/automation-client/project/git/Git
 import Commit = RepoBranchTips.Commit;
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { AssertOptions } from "../AssertOptions";
-import { doWithOptions, wait } from "../util/wait";
+import { doWithOptions, FatalError } from "../util/retry";
 
 export type State = "error" | "failure" | "pending" | "success";
 
@@ -82,12 +82,17 @@ export class GitHubAssertions implements GitRemoteAssertions {
                                  state: State,
                                  opts?: AssertOptions): Promise<Status> {
         return doWithOptions(async () => {
-            // TODO fail finally if we get a failure status
                 logger.debug(`Looking for status satisfying [${test}] on commit ${id.sha}; options=${JSON.stringify(opts)}...`);
                 const statuses = await this.statuses(id);
-                const it = statuses.find(s => test(s) && s.state === state);
+                const it = statuses.find(s => test(s));
                 if (!it) {
-                    throw new Error(`Status satisfying [${test}] required on commit ${id.sha}: Found ` + JSON.stringify(statuses));
+                    throw new Error(`Not there: Status satisfying [${test}] required on commit ${id.sha}: Found ` + JSON.stringify(statuses));
+                }
+                if (it.state === "failure") {
+                    throw new FatalError(`Failed state: Status satisfying [${test}] required on commit ${id.sha}: Found ` + JSON.stringify(statuses));
+                }
+                if (it.state !== state) {
+                    throw new Error(`Keeping looking: Status satisfying [${test}] required on commit ${id.sha}: Found ` + JSON.stringify(statuses));
                 }
                 return it;
             }, `Waiting for status satisfying [${test}] and state [${state}] on commit ${id.sha}`,

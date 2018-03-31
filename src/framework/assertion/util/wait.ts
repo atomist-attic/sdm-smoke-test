@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { doWithRetry } from "@atomist/automation-client/util/retry";
-import { AssertOptions } from "../AssertOptions";
-
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -38,23 +34,4 @@ export async function wait(n: number) {
 export async function blowUpInMillis(what: string, n: number): Promise<any> {
     await wait(n);
     throw new Error(`${what} timed out after ${n} milliseconds`);
-}
-
-export async function doWithOptions<T>(what: () => Promise<T>,
-                                       description: string,
-                                       opts: AssertOptions): Promise<T> {
-    const withRetryIfNeeded: () => Promise<T> = !!opts && !!opts.retries ?
-        () => doWithRetry(what, description, opts) :
-        what;
-    logger.info("doWithOptions: %s - %j", description, opts);
-    logger.info("Code: %s", withRetryIfNeeded.toString());
-    if (!!opts && !!opts.delayForMillis) {
-        await wait(opts.delayForMillis);
-    }
-    return !!opts && !!opts.allowMillis ?
-        Promise.race([
-            blowUpInMillis("Get commit", opts.allowMillis),
-            withRetryIfNeeded(),
-        ]) :
-        withRetryIfNeeded();
 }
