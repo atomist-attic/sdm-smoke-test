@@ -24,6 +24,8 @@ import { allow, seconds } from "../src/framework/assertion/AssertOptions";
 import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
 import { waitForSuccessOf } from "../src/framework/assertion/github/statusUtils";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
+import { editOne } from "@atomist/automation-client/operations/edit/editAll";
+import { BranchCommit, isBranchCommit } from "@atomist/automation-client/operations/edit/editModes";
 
 const RepoToTest = "losgatos1";
 
@@ -90,39 +92,39 @@ describe("test against existing Java project", () => {
 
         });
 
-    });
+        describe("material changes", () => {
 
-    describe("material changes", () => {
+            it("changes Java on a branch and sees local deployment", async () => {
+                const branch = "test-" + new Date().getTime();
+                const master = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest});
 
-        it("changes Java on a branch and sees local deployment", async () => {
-            const branch = "test-" + new Date().getTime();
-            const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch});
+                const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
 
-            const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
-            logger.info(`Invoking handler with [${customAffirmation}]...`);
+                await editOne(null, config.credentials,
+                    async p => p.addFile(
+                        "src/main/java/Thing.java",
+                        `// ${customAffirmation}\n// ${branch}\npublic class Thing {}`),
+                    {branch, message: "Squirrels"} as BranchCommit,
+                    master);
 
-            await invokeCommandHandler(config,
-                editorOneInvocation("javaAffirmation", repo,
-                    {customAffirmation, branch},
-                ));
-            logger.info("Handler returned. Waiting for GitHub...");
+                logger.info("Edit made. Waiting for GitHub...");
+                const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch});
 
-            const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
-            // const newReadme = currentProject.findFileSync("README.md").getContentSync();
-            const gitStatus = await currentProject.gitStatus();
-            // assert(newReadme.includes(customAffirmation));
-            // logger.info(`Found [${customAffirmation}] in new README`);
+                const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
+                const gitStatus = await currentProject.gitStatus();
 
-            // Now verify context
-            const buildStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
-                s => s.context.includes("build"),
-                allow(seconds(80)).withRetries(10),
-            );
-            logger.info("Found required build status %j", status);
-            assert(buildStatus.state === "success");
+                // Now verify context
+                const buildStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
+                    s => s.context.includes("build"),
+                    allow(seconds(80)).withRetries(10),
+                );
+                logger.info("Found required build status %j", status);
+                assert(buildStatus.state === "success");
 
-            // TODO connect to local endpoint
-        }).timeout(100000);
+                // TODO connect to local endpoint
+            }).timeout(100000);
+
+        });
 
     });
 
