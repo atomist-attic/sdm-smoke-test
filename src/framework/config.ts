@@ -15,8 +15,6 @@
  */
 
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
-import { AxiosRequestConfig } from "axios";
-import axios from "axios";
 
 export interface SmokeTestConfig {
     atomistTeamId: string;
@@ -30,27 +28,3 @@ export interface SmokeTestConfig {
 
     credentials: ProjectOperationCredentials;
 }
-
-export function automationServerAuthHeaders(config: SmokeTestConfig): AxiosRequestConfig {
-    return {
-        headers: {
-            "content-type": "application/json",
-            // Authorization: `Bearer ${config.jwt}`,
-        },
-        auth: {
-            username: config.user,
-            password: config.password,
-        },
-    };
-}
-
-/*
-export async function getBearerToken(config: SmokeTestConfig): Promise<string> {
-    // curl -u admin:100dd8e5-a154-4598-b124-879abb89df62 -v localhost:2866/info
-    const url = config.baseEndpoint + "/info";
-    const res = await axios.get(url, {
-
-    })
-
-}
-*/

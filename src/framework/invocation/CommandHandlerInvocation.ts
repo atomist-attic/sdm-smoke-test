@@ -18,9 +18,9 @@ import { HandlerResult, logger } from "@atomist/automation-client";
 import { Arg, Secret } from "@atomist/automation-client/internal/invoker/Payload";
 
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import * as _ from "lodash";
-import { automationServerAuthHeaders, SmokeTestConfig } from "../config";
+import { SmokeTestConfig } from "../config";
 
 import * as assert from "power-assert";
 import { hasOwnProperty } from "tslint/lib/utils";
@@ -102,6 +102,30 @@ export function editorOneInvocation(editorCommandName: string,
         ],
     };
 }
+
+export function automationServerAuthHeaders(config: SmokeTestConfig): AxiosRequestConfig {
+    return {
+        headers: {
+            "content-type": "application/json",
+            // Authorization: `Bearer ${config.jwt}`,
+        },
+        auth: {
+            username: config.user,
+            password: config.password,
+        },
+    };
+}
+
+/*
+export async function getBearerToken(config: SmokeTestConfig): Promise<string> {
+    // curl -u admin:100dd8e5-a154-4598-b124-879abb89df62 -v localhost:2866/info
+    const url = config.baseEndpoint + "/info";
+    const res = await axios.get(url, {
+
+    })
+
+}
+*/
 
 function propertiesToArgs(o: any): Arg[] {
     const args = [];
