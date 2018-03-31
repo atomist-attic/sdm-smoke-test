@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 import { editOne } from "@atomist/automation-client/operations/edit/editAll";
 import { EditMode } from "@atomist/automation-client/operations/edit/editModes";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { SimpleProjectEditor } from "@atomist/automation-client/operations/edit/projectEditor";
-import { Project } from "@atomist/automation-client/project/Project";
 import { EditResult } from "@atomist/automation-client/operations/edit/projectEditor";
-import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
+import { Project } from "@atomist/automation-client/project/Project";
 
 export function edit(credentials: ProjectOperationCredentials,
                      id: GitHubRepoRef,

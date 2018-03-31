@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import axios, { AxiosPromise } from "axios";
 import * as https from "https";
 

@@ -19,14 +19,14 @@ import { TestConfig } from "./fixture";
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { BranchCommit } from "@atomist/automation-client/operations/edit/editModes";
 import * as assert from "power-assert";
 import { allow, seconds } from "../src/framework/assertion/AssertOptions";
 import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
 import { waitForSuccessOf } from "../src/framework/assertion/github/statusUtils";
-import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
-import { BranchCommit } from "@atomist/automation-client/operations/edit/editModes";
 import { edit } from "../src/framework/assertion/util/edit";
 import { verifyGet } from "../src/framework/assertion/util/endpoint";
+import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
 
 const RepoToTest = "losgatos1";
 
@@ -106,7 +106,7 @@ describe("test against existing Java project", () => {
                     {branch, message: "Squirrels"} as BranchCommit,
                     async p => p.addFile(
                         "src/main/java/Thing.java",
-                        `// ${customAffirmation}\n// ${branch}\npublic class Thing {}`),);
+                        `// ${customAffirmation}\n// ${branch}\npublic class Thing {}`));
 
                 logger.info("Edit made. Waiting for GitHub...");
                 const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch});
