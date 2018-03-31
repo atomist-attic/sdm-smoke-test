@@ -29,6 +29,7 @@ import {
 } from "../src/framework/assertion/github/statusUtils";
 import { edit } from "../src/framework/assertion/util/edit";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
+import { ApacheHeader } from "./javaLibraryTest";
 
 const RepoToTest = "losgatos1";
 
@@ -105,7 +106,7 @@ describe("test against existing Java HTTP service", () => {
                 commitToMaster("Squirrels"),
                 async p => p.addFile(
                     "src/main/java/Thing.java",
-                    `// ${customAffirmation}\npublic class Thing {}`));
+                    `${ApacheHeader}\n// ${customAffirmation}\npublic class Thing {}`));
 
             logger.info("Edit made. Waiting for GitHub...");
             const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch: "master"});
@@ -132,7 +133,7 @@ describe("test against existing Java HTTP service", () => {
                 {branch, message: "Squirrels"} as BranchCommit,
                 async p => p.addFile(
                     "src/main/java/Thing.java",
-                    `// ${customAffirmation}\n// ${branch}\npublic class Thing {}`));
+                    `${ApacheHeader}\n// ${customAffirmation}\n// ${branch}\npublic class Thing {}`));
 
             logger.info("Edit made. Waiting for GitHub...");
             const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch});
