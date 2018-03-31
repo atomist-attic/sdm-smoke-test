@@ -17,6 +17,7 @@
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { allow, AssertOptions, seconds } from "../AssertOptions";
 import { GitHubAssertions, Status } from "./GitHubAssertions";
+import { logger } from "@atomist/automation-client";
 
 /**
  * Block for a certain period of time for a successful status
@@ -37,4 +38,14 @@ export function waitForSuccessOf(gitRemoteHelper: GitHubAssertions,
         "success",
         opts || allow(seconds(40)).withRetries(10),
     );
+}
+
+export async function verifySdmBuildSuccess(gitRemoteHelper: GitHubAssertions,
+                                            repo: { owner: string, repo: string, sha: string }): Promise<Status> {
+    const buildStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
+        s => s.context.includes("build"),
+        allow(seconds(80)).withRetries(10),
+    );
+    logger.info("Found build success status");
+    return buildStatus;
 }
