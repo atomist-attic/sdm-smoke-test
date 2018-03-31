@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
+import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { allow, AssertOptions, seconds } from "../AssertOptions";
-import { GitHubAssertions, Status } from "./GitHubAssertions";
-import { logger } from "@atomist/automation-client";
 import { verifyGet } from "../util/endpoint";
+import { GitHubAssertions, Status } from "./GitHubAssertions";
 
 import * as assert from "power-assert";
 

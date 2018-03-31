@@ -25,7 +25,7 @@ import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssert
 import {
     verifyCodeReactionSuccess,
     verifySdmBuildSuccess, verifySdmDeploy,
-    waitForSuccessOf
+    waitForSuccessOf,
 } from "../src/framework/assertion/github/statusUtils";
 import { edit } from "../src/framework/assertion/util/edit";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
