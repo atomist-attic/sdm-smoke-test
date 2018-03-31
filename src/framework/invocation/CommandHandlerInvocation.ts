@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-import {HandlerResult, logger} from "@atomist/automation-client";
-import {Arg, Secret} from "@atomist/automation-client/internal/invoker/Payload";
+import { HandlerResult, logger } from "@atomist/automation-client";
+import { Arg, Secret } from "@atomist/automation-client/internal/invoker/Payload";
 
-import {RemoteRepoRef} from "@atomist/automation-client/operations/common/RepoId";
-import axios, {AxiosError, AxiosResponse} from "axios";
+import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import * as _ from "lodash";
-import {automationServerAuthHeaders, SmokeTestConfig} from "../config";
+import { automationServerAuthHeaders, SmokeTestConfig } from "../config";
 
 import * as assert from "power-assert";
+import { hasOwnProperty } from "tslint/lib/utils";
+
+export interface Params {
+
+    [propName: string]: string | number;
+}
 
 export interface CommandHandlerInvocation {
     name: string;
-    parameters: Arg[];
+    parameters: Params;
     mappedParameters?: Arg[];
     secrets?: Secret[];
 }
@@ -35,7 +41,7 @@ export async function invokeCommandHandler(config: SmokeTestConfig,
                                            invocation: CommandHandlerInvocation): Promise<HandlerResult> {
     const url = `/command/${_.kebabCase(invocation.name)}`;
     const data = {
-        parameters: invocation.parameters,
+        parameters: propertiesToArgs(invocation.parameters),
         mapped_parameters: invocation.mappedParameters,
         secrets: invocation.secrets,
         command: invocation.name,
@@ -83,7 +89,7 @@ function interpretSdmResponse(config: SmokeTestConfig, url: string) {
 
 export function editorOneInvocation(editorCommandName: string,
                                     rr: RemoteRepoRef,
-                                    parameters: Arg[] = []): CommandHandlerInvocation {
+                                    parameters: Params): CommandHandlerInvocation {
     return {
         name: editorCommandName,
         parameters,
@@ -95,4 +101,14 @@ export function editorOneInvocation(editorCommandName: string,
             {uri: "github://user_token?scopes=repo,user:email,read:user", value: process.env.GITHUB_TOKEN},
         ],
     };
+}
+
+function propertiesToArgs(o: any): Arg[] {
+    const args = [];
+    for (const name in o) {
+        if (hasOwnProperty(o, name)) {
+            args.push({ name, value: o[name]});
+        }
+    }
+    return args;
 }

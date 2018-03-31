@@ -46,8 +46,7 @@ describe("test against existing Java project", () => {
 
                 await invokeCommandHandler(config,
                     editorOneInvocation("affirmation", repo,
-                        // TODO simplify parameter passing
-                        [{name: "customAffirmation", value: customAffirmation}]));
+                        {customAffirmation}));
                 logger.info("Handler returned. Waiting for GitHub...");
 
                 const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
@@ -73,11 +72,8 @@ describe("test against existing Java project", () => {
 
                 await invokeCommandHandler(config,
                     editorOneInvocation("affirmation", repo,
-                        // TODO simplify parameter passing: Do we have a type
-                        [
-                            {name: "customAffirmation", value: customAffirmation},
-                            {name: "branch", value: branch},
-                        ]));
+                        {customAffirmation, name},
+                    ));
                 logger.info("Handler returned. Waiting for GitHub...");
 
                 const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
@@ -107,11 +103,8 @@ describe("test against existing Java project", () => {
 
             await invokeCommandHandler(config,
                 editorOneInvocation("javaAffirmation", repo,
-                    // TODO simplify parameter passing: Do we have a type
-                    [
-                        {name: "customAffirmation", value: customAffirmation},
-                        {name: "branch", value: branch},
-                    ]));
+                    {customAffirmation, branch},
+                ));
             logger.info("Handler returned. Waiting for GitHub...");
 
             const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});

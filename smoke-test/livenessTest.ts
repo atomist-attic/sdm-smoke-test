@@ -25,7 +25,7 @@ describe("basic thereness", () => {
     it("can describe itself", async () => {
         const handlerResult = await invokeCommandHandler(TestConfig, {
             name: "SelfDescribe",
-            parameters: [],
+            parameters: {},
         });
         assert(handlerResult.message.includes("brilliant"), "Not brilliant: " + stringify(handlerResult));
     }).timeout(20000);
