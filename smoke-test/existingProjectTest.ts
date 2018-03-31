@@ -37,7 +37,7 @@ describe("test against existing Java project", () => {
 
         describe("immaterial changes", () => {
 
-            it("changes readme and judges immaterial", async () => {
+            it("changes README and judges immaterial", async () => {
                 const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch: "master"});
                 const previousTipOfMaster = await gitRemoteHelper.lastCommit(repo);
 
@@ -58,9 +58,9 @@ describe("test against existing Java project", () => {
                 logger.info(`Found [${customAffirmation}] in new README`);
 
                 // Now verify context
-                const immaterialStatus = waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
+                const immaterialStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
                     s => s.context.includes("immaterial"));
-                logger.info("Found required status %j", immaterialStatus);
+                logger.info("Found required immaterial status %j", immaterialStatus);
             }).timeout(100000);
 
             it("changes README on a branch and judges immaterial", async () => {
@@ -72,7 +72,7 @@ describe("test against existing Java project", () => {
 
                 await invokeCommandHandler(config,
                     editorOneInvocation("affirmation", repo,
-                        {customAffirmation, name},
+                        {customAffirmation, branch},
                     ));
                 logger.info("Handler returned. Waiting for GitHub...");
 
