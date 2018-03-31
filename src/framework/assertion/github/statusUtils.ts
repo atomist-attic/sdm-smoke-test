@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { allow, AssertOptions, seconds } from "../AssertOptions";
 import { GitHubAssertions, Status } from "./GitHubAssertions";
+import { logger } from "@atomist/automation-client";
+import { verifyGet } from "../util/endpoint";
+
+import * as assert from "power-assert";
 
 /**
  * Block for a certain period of time for a successful status
@@ -40,6 +43,16 @@ export function waitForSuccessOf(gitRemoteHelper: GitHubAssertions,
     );
 }
 
+export async function verifyCodeReactionSuccess(gitRemoteHelper: GitHubAssertions,
+                                                repo: { owner: string, repo: string, sha: string }): Promise<Status> {
+    const codeReactionStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
+        s => s.context.includes("react"),
+        allow(seconds(15)).withRetries(8),
+    );
+    logger.info("Found code reaction success status");
+    return codeReactionStatus;
+}
+
 export async function verifySdmBuildSuccess(gitRemoteHelper: GitHubAssertions,
                                             repo: { owner: string, repo: string, sha: string }): Promise<Status> {
     const buildStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
@@ -48,4 +61,25 @@ export async function verifySdmBuildSuccess(gitRemoteHelper: GitHubAssertions,
     );
     logger.info("Found build success status");
     return buildStatus;
+}
+
+export async function verifySdmDeploy(gitRemoteHelper: GitHubAssertions,
+                                      repo: { owner: string, repo: string, sha: string }): Promise<Status> {
+
+    const deployStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
+        s => s.context.includes("deploy"),
+        allow(seconds(80)).withRetries(10),
+    );
+    logger.info("Found deploy success status");
+
+    const endpointStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
+        s => s.context.includes("endpoint"),
+        allow(seconds(5)).withRetries(2),
+    );
+    logger.info("Found endpoint success status");
+
+    assert(!!endpointStatus.target_url, "Target URL should be set on endpoint");
+    const resp = await verifyGet(endpointStatus.target_url);
+    logger.info("Verified endpoint at " + endpointStatus.target_url);
+    return endpointStatus;
 }

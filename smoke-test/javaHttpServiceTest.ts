@@ -19,13 +19,15 @@ import { TestConfig } from "./fixture";
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { BranchCommit } from "@atomist/automation-client/operations/edit/editModes";
+import { BranchCommit, commitToMaster } from "@atomist/automation-client/operations/edit/editModes";
 import * as assert from "power-assert";
-import { allow, seconds } from "../src/framework/assertion/AssertOptions";
 import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
-import { waitForSuccessOf } from "../src/framework/assertion/github/statusUtils";
+import {
+    verifyCodeReactionSuccess,
+    verifySdmBuildSuccess, verifySdmDeploy,
+    waitForSuccessOf
+} from "../src/framework/assertion/github/statusUtils";
 import { edit } from "../src/framework/assertion/util/edit";
-import { verifyGet } from "../src/framework/assertion/util/endpoint";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
 
 const RepoToTest = "losgatos1";
@@ -93,6 +95,32 @@ describe("test against existing Java HTTP service", () => {
 
     describe("material changes", () => {
 
+        it("changes Java on default branch and sees staging deployment", async () => {
+            const master = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest});
+
+            const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
+
+            await edit(config.credentials,
+                master,
+                commitToMaster("Squirrels"),
+                async p => p.addFile(
+                    "src/main/java/Thing.java",
+                    `// ${customAffirmation}\npublic class Thing {}`));
+
+            logger.info("Edit made. Waiting for GitHub...");
+            const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest, branch: "master"});
+
+            const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
+            const gitStatus = await currentProject.gitStatus();
+
+            await verifyCodeReactionSuccess(gitRemoteHelper,
+                { owner: repo.owner, repo: repo.repo, sha: gitStatus.sha});
+            await verifySdmBuildSuccess(gitRemoteHelper,
+                { owner: repo.owner, repo: repo.repo, sha: gitStatus.sha});
+            await verifySdmDeploy(gitRemoteHelper,
+                { owner: repo.owner, repo: repo.repo, sha: gitStatus.sha});
+        }).timeout(100000);
+
         it("changes Java on a branch and sees local deployment", async () => {
             const branch = "test-" + new Date().getTime();
             const master = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToTest});
@@ -112,24 +140,8 @@ describe("test against existing Java HTTP service", () => {
             const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
             const gitStatus = await currentProject.gitStatus();
 
-            // TODO factor this into local deploy statuses
-            // Now verify context
-            const deployStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
-                s => s.context.includes("deploy"),
-                allow(seconds(80)).withRetries(10),
-            );
-            logger.info("Found deploy success status");
-
-            const endpointStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
-                s => s.context.includes("endpoint"),
-                allow(seconds(5)).withRetries(2),
-            );
-            logger.info("Found endpoint success status");
-
-            assert(!!endpointStatus.target_url, "Target URL should be set on endpoint");
-            const resp = await verifyGet(endpointStatus.target_url);
-            logger.info("Verified endpoint at " + endpointStatus.target_url);
-
+            await verifySdmDeploy(gitRemoteHelper,
+                { owner: repo.owner, repo: repo.repo, sha: gitStatus.sha});
         }).timeout(100000);
 
     });

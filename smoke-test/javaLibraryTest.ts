@@ -26,7 +26,7 @@ import { verifySdmBuildSuccess } from "../src/framework/assertion/github/statusU
 import { edit } from "../src/framework/assertion/util/edit";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
 
-const RepoToTest = "m2";
+const RepoToTest = "java-hello-world-maven";
 
 const config = TestConfig;
 
@@ -108,7 +108,6 @@ describe("test against existing Java library", () => {
 
             await verifySdmBuildSuccess(gitRemoteHelper,
                 { owner: repo.owner, repo: repo.repo, sha: gitStatus.sha});
-
         }).timeout(100000);
 
     });
