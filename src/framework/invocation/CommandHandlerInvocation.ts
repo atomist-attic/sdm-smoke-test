@@ -43,7 +43,9 @@ export async function invokeCommandHandler(config: SmokeTestConfig,
     const data = {
         parameters: propertiesToArgs(invocation.parameters),
         mapped_parameters: invocation.mappedParameters,
-        secrets: invocation.secrets,
+        secrets: (invocation.secrets || []).concat([
+            {uri: "github://user_token?scopes=repo,user:email,read:user", value: process.env.GITHUB_TOKEN},
+        ]),
         command: invocation.name,
     };
     logger.debug(`Hitting ${url} to test command ${invocation.name}`);
@@ -97,9 +99,7 @@ export function editorOneInvocation(editorCommandName: string,
             {name: "targets.owner", value: rr.owner},
             {name: "targets.repo", value: rr.repo},
         ],
-        secrets: [
-            {uri: "github://user_token?scopes=repo,user:email,read:user", value: process.env.GITHUB_TOKEN},
-        ],
+        secrets: [],
     };
 }
 
@@ -131,7 +131,7 @@ function propertiesToArgs(o: any): Arg[] {
     const args = [];
     for (const name in o) {
         if (hasOwnProperty(o, name)) {
-            args.push({ name, value: o[name]});
+            args.push({name, value: o[name]});
         }
     }
     return args;

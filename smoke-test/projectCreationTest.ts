@@ -17,16 +17,39 @@
 import "mocha";
 
 import * as assert from "power-assert";
+import { logger } from "@atomist/automation-client";
+import { waitForSuccessOf } from "../src/framework/assertion/github/statusUtils";
+import { invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
+import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
+import { TestConfig } from "./fixture";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+
+const config = TestConfig;
+
+const RepoToCreate = "foo1";
 
 describe("project creation", () => {
 
     describe("spring boot project creation", () => {
 
-        // it("changes readme", async () => {
-        //     const handlerResult = await invokeCommandHandler(TestConfig,
-        //         editorOneInvocation(AffirmationEditorName, TestConfig.githubOrg, RepoToTest));
-        //     assert(handlerResult.success);
-        // }).timeout(100000);
+        const gitRemoteHelper: GitHubAssertions = new GitHubAssertions(config.credentials);
+
+        it("create a project and verify it exists", async () => {
+            const repo = GitHubRepoRef.from({owner: config.githubOrg, repo: RepoToCreate});
+            await invokeCommandHandler(config,
+                {
+                    name: "springBootGenerator",
+                    parameters: { "target.repo": RepoToCreate, "rootPackage": "com.atomist"},
+                });
+            logger.info("Handler returned. Waiting for GitHub...");
+
+            const createdProject = await gitRemoteHelper.clone(repo, {retries: 5});
+
+            // // Now verify context
+            // const immaterialStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
+            //     s => s.context.includes("immaterial"));
+            // logger.info("Found required immaterial status %j", immaterialStatus);
+        }).timeout(100000);
 
     });
 
