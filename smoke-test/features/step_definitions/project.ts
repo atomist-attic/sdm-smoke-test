@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { Given, Then, When } from "cucumber";
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { SmokeTestConfig } from "../../../src/framework/config";
-import { TestConfig } from "../../fixture";
+import { Given, Then, When } from "cucumber";
 import { GitHubAssertions } from "../../../src/framework/assertion/github/GitHubAssertions";
-import { editorOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { verifySdmBuildSuccess } from "../../../src/framework/assertion/github/statusUtils";
+import { SmokeTestConfig } from "../../../src/framework/config";
+import { editorOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
+import { TestConfig } from "../../fixture";
 
 const config: SmokeTestConfig = TestConfig;
 
