@@ -16,13 +16,13 @@
 
 import "mocha";
 
-import * as assert from "power-assert";
 import { logger } from "@atomist/automation-client";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import * as assert from "power-assert";
+import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
 import { waitForSuccessOf } from "../src/framework/assertion/github/statusUtils";
 import { invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
-import { GitHubAssertions } from "../src/framework/assertion/github/GitHubAssertions";
 import { TestConfig } from "./fixture";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 
 const config = TestConfig;
 
