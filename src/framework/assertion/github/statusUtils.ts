@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
+import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { allow, AssertOptions, seconds } from "../AssertOptions";
 import { GitHubAssertions, Status } from "./GitHubAssertions";
-import { logger } from "@atomist/automation-client";
 
 /**
  * Block for a certain period of time for a successful status
