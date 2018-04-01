@@ -74,7 +74,7 @@ When("README is changed on a new branch", {timeout: 10 * 4000}, async () => {
 When("Java is changed on master", {timeout: 10 * 4000}, async () => {
     const repo = GitHubRepoRef.from(focusRepo);
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
-    logger.info(`Invoking handler with [${customAffirmation}]...`);
+    logger.info(`Invoking editor with [${customAffirmation}]...`);
 
     await edit(config.credentials,
         repo,
@@ -90,10 +90,10 @@ When("Java is changed on master", {timeout: 10 * 4000}, async () => {
 
 When("Java is changed on a new branch", {timeout: 10 * 4000}, async () => {
     const branch = "test-" + new Date().getTime();
-    focusRepo.branch = branch;
-    const repo = GitHubRepoRef.from(focusRepo);
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
     logger.info(`Invoking editor with [${customAffirmation}]...`);
+    const repo = GitHubRepoRef.from(focusRepo);
+    focusRepo.branch = branch;
 
     await edit(config.credentials,
         repo,
