@@ -22,6 +22,9 @@ import { verifySdmBuildSuccess } from "../../../src/framework/assertion/github/s
 import { SmokeTestConfig } from "../../../src/framework/config";
 import { editorOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { TestConfig } from "../../fixture";
+import { edit } from "../../../src/framework/assertion/util/edit";
+import { BranchCommit, commitToMaster } from "@atomist/automation-client/operations/edit/editModes";
+import { ApacheHeader } from "../support/headers";
 
 const config: SmokeTestConfig = TestConfig;
 
@@ -34,7 +37,7 @@ Given(/project (.*)/, project => {
     logger.info("Focus project is %j", focusRepo);
 });
 
-When("README is changed", {timeout: 10 * 4000}, async () => {
+When("README is changed on master", {timeout: 10 * 4000}, async () => {
     const repo = GitHubRepoRef.from(focusRepo);
 
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
@@ -50,7 +53,7 @@ When("README is changed", {timeout: 10 * 4000}, async () => {
     focusRepo.sha = gitStatus.sha;
 });
 
-When("README is changed on new branch", {timeout: 10 * 4000}, async () => {
+When("README is changed on a new branch", {timeout: 10 * 4000}, async () => {
     const branch = "test-" + new Date().getTime();
     focusRepo.branch = branch;
     const repo = GitHubRepoRef.from(focusRepo);
@@ -68,7 +71,43 @@ When("README is changed on new branch", {timeout: 10 * 4000}, async () => {
     focusRepo.sha = gitStatus.sha;
 });
 
-Then("it should build", {timeout: 60 * 1000}, async () => {
+When("Java is changed on master", {timeout: 10 * 4000}, async () => {
+    const repo = GitHubRepoRef.from(focusRepo);
+    const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
+    logger.info(`Invoking handler with [${customAffirmation}]...`);
+
+    await edit(config.credentials,
+        repo,
+        commitToMaster("Squirrels"),
+        async p => p.addFile(
+            "src/main/java/Thing.java",
+            `${ApacheHeader}\n// ${customAffirmation}\npublic class Thing {}`));
+
+    const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
+    const gitStatus = await currentProject.gitStatus();
+    focusRepo.sha = gitStatus.sha;
+});
+
+When("Java is changed on a new branch", {timeout: 10 * 4000}, async () => {
+    const branch = "test-" + new Date().getTime();
+    focusRepo.branch = branch;
+    const repo = GitHubRepoRef.from(focusRepo);
+    const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
+    logger.info(`Invoking editor with [${customAffirmation}]...`);
+
+    await edit(config.credentials,
+        repo,
+        { message: "Squirrels", branch} as BranchCommit,
+        async p => p.addFile(
+            "src/main/java/Thing.java",
+            `${ApacheHeader}\n// ${customAffirmation}\npublic class Thing {}`));
+
+    const currentProject = await gitRemoteHelper.clone(repo, {retries: 5});
+    const gitStatus = await currentProject.gitStatus();
+    focusRepo.sha = gitStatus.sha;
+});
+
+Then("it should build successfully", {timeout: 60 * 1000}, async () => {
     await verifySdmBuildSuccess(gitRemoteHelper, focusRepo);
 });
 

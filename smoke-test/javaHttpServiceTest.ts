@@ -29,7 +29,7 @@ import {
 } from "../src/framework/assertion/github/statusUtils";
 import { edit } from "../src/framework/assertion/util/edit";
 import { editorOneInvocation, invokeCommandHandler } from "../src/framework/invocation/CommandHandlerInvocation";
-import { ApacheHeader } from "./javaLibraryTest";
+import { ApacheHeader } from "./features/support/headers";
 
 const RepoToTest = "losgatos1";
 
