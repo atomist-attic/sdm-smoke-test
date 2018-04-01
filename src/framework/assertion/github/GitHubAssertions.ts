@@ -49,6 +49,7 @@ export class GitHubAssertions implements GitRemoteAssertions {
     private readonly credentials: TokenCredentials;
 
     constructor(credentials: ProjectOperationCredentials) {
+        assert(!!credentials, "Credentials must be set");
         this.credentials = credentials as TokenCredentials;
     }
 

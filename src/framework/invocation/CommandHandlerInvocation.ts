@@ -39,6 +39,8 @@ export interface CommandHandlerInvocation {
 
 export async function invokeCommandHandler(config: SmokeTestConfig,
                                            invocation: CommandHandlerInvocation): Promise<HandlerResult> {
+    assert(!!config, "Config must be provided");
+    assert(!!config.baseEndpoint, "Base endpoint must be provided: saw " + JSON.stringify(config));
     const url = `/command/${_.kebabCase(invocation.name)}`;
     const data = {
         parameters: propertiesToArgs(invocation.parameters),

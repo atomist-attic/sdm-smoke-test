@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-import { Then } from "cucumber";
-import { stringify } from "querystring";
-import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { TestConfig } from "../../fixture";
+import { SmokeTestConfig } from "../../../src/framework/config";
+import { GitHubAssertions } from "../../../src/framework/assertion/github/GitHubAssertions";
 
-import * as assert from "power-assert";
+export class SmokeTestWorld {
 
-Then("SDM should describe itself", async function() {
-    const handlerResult = await invokeCommandHandler(TestConfig, {
-        name: "SelfDescribe",
-        parameters: {},
-    });
-    assert(handlerResult.message.includes("brilliant"), "Not brilliant: " + stringify(handlerResult));
-});
+    public focusRepo: { owner: string, repo: string, branch?: string, sha: string };
+
+    constructor() {}
+
+    public readonly config: SmokeTestConfig = TestConfig;
+
+    public readonly gitRemoteHelper = new GitHubAssertions(this.config.credentials);
+
+}
