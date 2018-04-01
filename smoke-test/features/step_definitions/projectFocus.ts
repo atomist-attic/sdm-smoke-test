@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { Given } from "cucumber";
+import { Given, Then, When } from "cucumber";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
@@ -24,7 +23,14 @@ import { Given } from "cucumber";
  */
 
 Given(/project (.*)/, function(project) {
-    this.focusRepo = {owner: this.config.githubOrg, repo: project, sha: undefined};
-    logger.info("Focus project is %j", this.focusRepo);
+    this.setFocus( {owner: this.config.githubOrg, repo: project, sha: undefined});
 });
 
+// Save the current sha as name
+When(/save as (.*)/, function(name) {
+    this.save(name);
+});
+
+Then(/load (.*)/, function(name) {
+    this.load(name);
+});

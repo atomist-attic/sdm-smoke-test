@@ -27,4 +27,20 @@ Feature: Java HTTP service support
     Then reviews should succeed
     Then reactions should succeed
     Then it should deploy locally
-    
+
+  Scenario: Concurrent branch deploys
+    Given project losgatos1
+    When Java is changed on a new branch
+    When save as b1
+    When Java is changed on a new branch
+    When save as b2
+    Then load b1
+    Then build should succeed
+    Then reviews should succeed
+    Then reactions should succeed
+    Then it should deploy locally
+    Then load b2
+    Then build should succeed
+    Then reviews should succeed
+    Then reactions should succeed
+    Then it should deploy locally
