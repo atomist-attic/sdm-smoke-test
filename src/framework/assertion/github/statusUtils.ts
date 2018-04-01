@@ -53,6 +53,16 @@ export async function verifyCodeReactionSuccess(gitRemoteHelper: GitHubAssertion
     return codeReactionStatus;
 }
 
+export async function verifyReviewSuccess(gitRemoteHelper: GitHubAssertions,
+                                          repo: { owner: string, repo: string, sha: string }): Promise<Status> {
+    const reviewStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
+        s => s.context.includes("review"),
+        allow(seconds(15)).withRetries(8),
+    );
+    logger.info("Found code review success status");
+    return reviewStatus;
+}
+
 export async function verifySdmBuildSuccess(gitRemoteHelper: GitHubAssertions,
                                             repo: { owner: string, repo: string, sha: string }): Promise<Status> {
     const buildStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
