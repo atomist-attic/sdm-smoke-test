@@ -19,8 +19,8 @@ import { GitHubAssertions } from "../../../src/framework/assertion/github/GitHub
 import { SmokeTestConfig } from "../../../src/framework/config";
 import { TestConfig } from "../../fixture";
 
-import * as assert from "power-assert";
 import { logger } from "@atomist/automation-client";
+import * as assert from "power-assert";
 
 export interface Repo {
     owner: string;
