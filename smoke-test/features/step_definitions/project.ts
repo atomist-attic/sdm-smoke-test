@@ -16,11 +16,11 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { BranchCommit, commitToMaster } from "@atomist/automation-client/operations/edit/editModes";
 import { defineSupportCode, Given, Then, When } from "cucumber";
 import { verifySdmBuildSuccess } from "../../../src/framework/assertion/github/statusUtils";
-import { editorOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { edit } from "../../../src/framework/assertion/util/edit";
-import { BranchCommit, commitToMaster } from "@atomist/automation-client/operations/edit/editModes";
+import { editorOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { ApacheHeader } from "../support/headers";
 import { SmokeTestWorld } from "../support/world";
 
