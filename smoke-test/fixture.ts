@@ -18,13 +18,13 @@ import { SmokeTestConfig } from "../src/framework/config";
 
 export const TestConfig: SmokeTestConfig = {
 
-    atomistTeamId: "T5964N9B7",
+    atomistTeamId: process.env.ATOMIST_TEAMS || "T5964N9B7",
     baseEndpoint: "http://localhost:2866",
 
     user: "admin",
     password: process.env.LOCAL_ATOMIST_ADMIN_PASSWORD || throwError("Please define LOCAL_ATOMIST_ADMIN_PASSWORD"),
 
-    githubOrg: "spring-team",
+    githubOrg: process.env.SMOKETEST_ORG || "spring-team",
 
     credentials: {
         token: process.env.GITHUB_TOKEN || throwError("Please define GITHUB_TOKEN"),
