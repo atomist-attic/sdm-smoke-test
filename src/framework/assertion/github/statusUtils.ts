@@ -73,8 +73,13 @@ export async function verifySdmBuildSuccess(gitRemoteHelper: GitHubAssertions,
     return buildStatus;
 }
 
+export interface DeploymentStatuses {
+    deployStatus: Status;
+    endpointStatus: Status;
+}
+
 export async function verifySdmDeploy(gitRemoteHelper: GitHubAssertions,
-                                      repo: { owner: string, repo: string, sha: string }): Promise<Status> {
+                                      repo: { owner: string, repo: string, sha: string }): Promise<DeploymentStatuses> {
 
     const deployStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
         s => s.context.includes("deploy"),
@@ -91,5 +96,5 @@ export async function verifySdmDeploy(gitRemoteHelper: GitHubAssertions,
     assert(!!endpointStatus.target_url, "Target URL should be set on endpoint");
     const resp = await verifyGet(endpointStatus.target_url);
     logger.info("Verified endpoint at " + endpointStatus.target_url);
-    return endpointStatus;
+    return {deployStatus, endpointStatus};
 }
