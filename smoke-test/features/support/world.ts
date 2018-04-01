@@ -29,5 +29,4 @@ export class SmokeTestWorld {
 
 }
 
-// TODO pull this out
 setWorldConstructor(SmokeTestWorld);
