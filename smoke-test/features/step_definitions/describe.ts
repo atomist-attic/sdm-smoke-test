@@ -15,9 +15,9 @@
  */
 
 import { Then } from "cucumber";
-import { TestConfig } from "../../fixture";
 import { stringify } from "querystring";
 import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
+import { TestConfig } from "../../fixture";
 
 import * as assert from "power-assert";
 
