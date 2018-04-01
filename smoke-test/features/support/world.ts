@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import {setWorldConstructor} from "cucumber";
 import { GitHubAssertions } from "../../../src/framework/assertion/github/GitHubAssertions";
 import { SmokeTestConfig } from "../../../src/framework/config";
 import { TestConfig } from "../../fixture";
@@ -27,3 +28,6 @@ export class SmokeTestWorld {
     public readonly gitRemoteHelper = new GitHubAssertions(this.config.credentials);
 
 }
+
+// TODO pull this out
+setWorldConstructor(SmokeTestWorld);

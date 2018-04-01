@@ -29,11 +29,6 @@ import { SmokeTestWorld } from "../support/world";
 
 import * as assert from "power-assert";
 
-// TODO pull this out
-defineSupportCode(({setWorldConstructor: world}) => {
-    world(SmokeTestWorld);
-});
-
 // Note: We cannot use arrow functions as binding doesn't work
 
 Given(/project (.*)/, function(project) {
