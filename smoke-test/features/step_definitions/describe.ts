@@ -5,7 +5,7 @@ import { invokeCommandHandler } from "../../../src/framework/invocation/CommandH
 
 import * as assert from "power-assert";
 
-Then("SDM should describe itself", async () => {
+Then("SDM should describe itself", async function() {
     const handlerResult = await invokeCommandHandler(TestConfig, {
         name: "SelfDescribe",
         parameters: {},
