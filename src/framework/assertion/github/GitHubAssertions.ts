@@ -73,7 +73,7 @@ export class GitHubAssertions implements GitRemoteAssertions {
         const statuses = await this.statuses(id, opts);
         const it = statuses.find(test);
         if (!it) {
-            throw new Error(`Status satisfying [${test}] required on commit ${id.sha}: Found ` + JSON.stringify(statuses));
+            throw new Error(`Status satisfying [${test}] required on commit ${id.sha}: Found ` + statusesString(statuses));
         }
         return it;
     }
@@ -87,13 +87,13 @@ export class GitHubAssertions implements GitRemoteAssertions {
                 const statuses = await this.statuses(id);
                 const it = statuses.find(s => test(s));
                 if (!it) {
-                    throw new Error(`Not there: Status satisfying [${test}] required on commit ${id.sha}: Found ` + JSON.stringify(statuses));
+                    throw new Error(`Not there: Status satisfying [${test}] required on commit ${id.sha}: Found ` + statusesString(statuses));
                 }
                 if (it.state === "failure") {
-                    throw new FatalError(`Failed state: Status satisfying [${test}] required on commit ${id.sha}: Found ` + JSON.stringify(statuses));
+                    throw new FatalError(`Failed state: Status satisfying [${test}] required on commit ${id.sha}: Found ` + statusesString(statuses));
                 }
                 if (it.state !== state) {
-                    throw new Error(`Keeping looking: Status satisfying [${test}] required on commit ${id.sha}: Found ` + JSON.stringify(statuses));
+                    throw new Error(`Keeping looking: Status satisfying [${test}] required on commit ${id.sha}: Found ` + statusesString(statuses));
                 }
                 return it;
             }, `Waiting for status satisfying [${test}] and state [${state}] on commit ${id.sha}`,
@@ -153,4 +153,13 @@ export function listStatuses(token: string, rr: GitHubRepoRef): Promise<Status[]
     const url = `${rr.apiBase}/repos/${rr.owner}/${rr.repo}/commits/${rr.sha}/statuses`;
     return axios.get(url, config)
         .then(ap => ap.data);
+}
+
+function statusesString(statuses: Status[]) {
+    return `${statuses.length} statuses: \n${statuses
+        .map(statusString).join("\n\t")}`;
+}
+
+function statusString(s: Status) {
+    return `context='${s.context}';state='${s.state}';target_url=${s.target_url};description='${s.description}'`;
 }
