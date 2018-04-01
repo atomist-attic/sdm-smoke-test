@@ -20,7 +20,7 @@ import { BranchCommit, commitToMaster } from "@atomist/automation-client/operati
 import { defineSupportCode, Given, Then, When } from "cucumber";
 import {
     verifyCodeReactionSuccess, verifyReviewSuccess, verifySdmBuildSuccess, verifySdmDeploy,
-    waitForSuccessOf
+    waitForSuccessOf,
 } from "../../../src/framework/assertion/github/statusUtils";
 import { edit } from "../../../src/framework/assertion/util/edit";
 import { editorOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
@@ -36,12 +36,12 @@ defineSupportCode(({setWorldConstructor: world}) => {
 
 // Note: We cannot use arrow functions as binding doesn't work
 
-Given(/project (.*)/, function (project) {
+Given(/project (.*)/, function(project) {
     this.focusRepo = {owner: this.config.githubOrg, repo: project, sha: undefined};
     logger.info("Focus project is %j", this.focusRepo);
 });
 
-When("README is changed on master", {timeout: 10 * 4000}, async function () {
+When("README is changed on master", {timeout: 10 * 4000}, async function() {
     const repo = GitHubRepoRef.from(this.focusRepo);
 
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
@@ -58,7 +58,7 @@ When("README is changed on master", {timeout: 10 * 4000}, async function () {
     this.focusRepo.sha = gitStatus.sha;
 });
 
-When("README is changed on a new branch", {timeout: 10 * 4000}, async function () {
+When("README is changed on a new branch", {timeout: 10 * 4000}, async function() {
     const branch = "test-" + new Date().getTime();
     this.focusRepo.branch = branch;
     const repo = GitHubRepoRef.from(this.focusRepo);
@@ -76,7 +76,7 @@ When("README is changed on a new branch", {timeout: 10 * 4000}, async function (
     this.focusRepo.sha = gitStatus.sha;
 });
 
-When("Java is changed on master", {timeout: 10 * 4000}, async function () {
+When("Java is changed on master", {timeout: 10 * 4000}, async function() {
     const repo = GitHubRepoRef.from(this.focusRepo);
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
     logger.info(`Invoking editor with [${customAffirmation}]...`);
@@ -93,7 +93,7 @@ When("Java is changed on master", {timeout: 10 * 4000}, async function () {
     this.focusRepo.sha = gitStatus.sha;
 });
 
-When("Java is changed on a new branch", {timeout: 10 * 4000}, async function () {
+When("Java is changed on a new branch", {timeout: 10 * 4000}, async function() {
     const branch = "test-" + new Date().getTime();
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
     logger.info(`Invoking editor with [${customAffirmation}]...`);
@@ -112,35 +112,35 @@ When("Java is changed on a new branch", {timeout: 10 * 4000}, async function () 
     this.focusRepo.sha = gitStatus.sha;
 });
 
-Then("build should succeed", {timeout: 60 * 1000}, async function () {
+Then("build should succeed", {timeout: 60 * 1000}, async function() {
     await verifySdmBuildSuccess(this.gitRemoteHelper, this.focusRepo);
 });
 
-Then("reactions should succeed", {timeout: 60 * 1000}, async function () {
+Then("reactions should succeed", {timeout: 60 * 1000}, async function() {
     await verifyCodeReactionSuccess(this.gitRemoteHelper,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
 });
 
-Then("reviews should succeed", {timeout: 60 * 1000}, async function () {
+Then("reviews should succeed", {timeout: 60 * 1000}, async function() {
     await verifyReviewSuccess(this.gitRemoteHelper,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
 });
 
-Then("it should deploy locally", {timeout: 60 * 1000}, async function () {
+Then("it should deploy locally", {timeout: 60 * 1000}, async function() {
     const statuses = await verifySdmDeploy(this.gitRemoteHelper,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
     assert(statuses.deployStatus.context.includes("local"),
         `${statuses.deployStatus} does not include 'local'`);
 });
 
-Then("it should deploy to staging", {timeout: 60 * 1000}, async function () {
+Then("it should deploy to staging", {timeout: 60 * 1000}, async function() {
     const statuses = await verifySdmDeploy(this.gitRemoteHelper,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
     assert(statuses.deployStatus.context.includes("staging"),
         `${statuses.deployStatus} does not include 'staging'`);
 });
 
-Then("it should be immaterial", {timeout: 20 * 1000}, async function () {
+Then("it should be immaterial", {timeout: 20 * 1000}, async function() {
     const immaterialStatus = await waitForSuccessOf(this.gitRemoteHelper,
         this.focusRepo.owner, this.focusRepo.repo, this.focusRepo.sha,
         s => s.context.includes("immaterial"));
