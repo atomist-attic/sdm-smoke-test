@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-import { SmokeTestConfig } from "../src/framework/config";
+import { SmokeTestConfig } from "./config";
 
-export const EnvironmentConfig: SmokeTestConfig = {
+/**
+ * Load config from environment
+ * @type {{atomistTeamId: (string | any | string); atomistTeamName: (string | any | string); baseEndpoint: string; user: string; password: (string | any); githubOrg: (string | any | string); credentials: {token: (string | any)}}}
+ */
+export const EnvironmentSmokeTestConfig: SmokeTestConfig = {
 
     atomistTeamId: process.env.ATOMIST_TEAMS || "T5964N9B7",
 

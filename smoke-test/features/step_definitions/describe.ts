@@ -17,12 +17,12 @@
 import { Then } from "cucumber";
 import { stringify } from "querystring";
 import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
-import { EnvironmentConfig } from "../../fixture";
+import { EnvironmentSmokeTestConfig } from "../../../src/framework/EnvironmentSmokeTestConfig";
 
 import * as assert from "power-assert";
 
 Then("SDM should describe itself", async function() {
-    const handlerResult = await invokeCommandHandler(EnvironmentConfig, {
+    const handlerResult = await invokeCommandHandler(EnvironmentSmokeTestConfig, {
         name: "SelfDescribe",
         parameters: {},
     });

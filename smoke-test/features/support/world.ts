@@ -17,7 +17,7 @@
 import { setWorldConstructor } from "cucumber";
 import { GitHubAssertions } from "../../../src/framework/assertion/github/GitHubAssertions";
 import { SmokeTestConfig } from "../../../src/framework/config";
-import { EnvironmentConfig } from "../../fixture";
+import { EnvironmentSmokeTestConfig } from "../../../src/framework/EnvironmentSmokeTestConfig";
 
 import { logger } from "@atomist/automation-client";
 import * as assert from "power-assert";
@@ -37,7 +37,7 @@ export class SmokeTestWorld {
 
     public focusRepo: Repo;
 
-    public readonly config: SmokeTestConfig = EnvironmentConfig;
+    public readonly config: SmokeTestConfig = EnvironmentSmokeTestConfig;
 
     public readonly gitRemoteHelper = new GitHubAssertions(this.config.credentials);
 
