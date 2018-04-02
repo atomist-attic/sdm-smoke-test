@@ -16,15 +16,12 @@
 
 import { logger } from "@atomist/automation-client";
 import { Then } from "cucumber";
-import {
-    verifyCodeReactionSuccess,
-    verifyReviewSuccess,
-    verifySdmBuildSuccess,
-    verifySdmDeploy,
-    waitForSuccessOf,
-} from "../../../src/framework/assertion/github/statusUtils";
 
 import * as assert from "power-assert";
+import {
+    verifyCodeReactionState, verifyReviewState,
+    verifySdmBuildState, verifySdmDeploySuccess
+} from "../../../src/framework/assertion/github/statusUtils";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
@@ -32,36 +29,42 @@ import * as assert from "power-assert";
  * Definitions to verify GitHub statuses that should have been set by SDM under test
  */
 
-Then("build should succeed", {timeout: 60 * 1000}, async function() {
-    await verifySdmBuildSuccess(this.gitRemoteHelper, this.focusRepo);
+Then("build should succeed", {timeout: 60 * 1000}, async function () {
+    await verifySdmBuildState(this.gitRemoteHelper, this.focusRepo, "success");
 });
 
-Then("reactions should succeed", {timeout: 60 * 1000}, async function() {
-    await verifyCodeReactionSuccess(this.gitRemoteHelper,
-        {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
+Then("build should fail", {timeout: 60 * 1000}, async function() {
+    await verifySdmBuildState(this.gitRemoteHelper, this.focusRepo, "failure");
 });
 
-Then("reviews should succeed", {timeout: 60 * 1000}, async function() {
-    await verifyReviewSuccess(this.gitRemoteHelper,
-        {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
+Then("reactions should succeed", {timeout: 60 * 1000}, async function () {
+    await verifyCodeReactionState(this.gitRemoteHelper,
+        this.focusRepo,
+        "success");
 });
 
-Then("it should deploy locally", {timeout: 60 * 1000}, async function() {
-    const statuses = await verifySdmDeploy(this.gitRemoteHelper,
+Then("reviews should succeed", {timeout: 60 * 1000}, async function () {
+    await verifyReviewState(this.gitRemoteHelper,
+        this.focusRepo,
+        "success");
+});
+
+Then("it should deploy locally", {timeout: 60 * 1000}, async function () {
+    const statuses = await verifySdmDeploySuccess(this.gitRemoteHelper,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
     assert(statuses.deployStatus.context.includes("local"),
         `${statuses.deployStatus} does not include 'local'`);
 });
 
-Then("it should deploy to staging", {timeout: 60 * 1000}, async function() {
-    const statuses = await verifySdmDeploy(this.gitRemoteHelper,
+Then("it should deploy to staging", {timeout: 60 * 1000}, async function () {
+    const statuses = await verifySdmDeploySuccess(this.gitRemoteHelper,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
     assert(statuses.deployStatus.context.includes("staging"),
         `${statuses.deployStatus} does not include 'staging'`);
 });
 
-Then("it should be immaterial", {timeout: 20 * 1000}, async function() {
-    const immaterialStatus = await waitForSuccessOf(this.gitRemoteHelper,
+Then("it should be immaterial", {timeout: 20 * 1000}, async function () {
+    const immaterialStatus = await this.gitRemoteHelper.waitForSuccessOf(this.gitRemoteHelper,
         this.focusRepo.owner, this.focusRepo.repo, this.focusRepo.sha,
         s => s.context.includes("immaterial"));
     logger.info("Found required immaterial status %j", immaterialStatus);

@@ -16,57 +16,45 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { allow, AssertOptions, seconds } from "../AssertOptions";
+import { allow, seconds } from "../AssertOptions";
 import { verifyGet } from "../util/endpoint";
-import { GitHubAssertions, Status } from "./GitHubAssertions";
+import { GitHubAssertions, State, Status } from "./GitHubAssertions";
 
 import * as assert from "power-assert";
 
-/**
- * Block for a certain period of time for a successful status
- * @param {GitHubAssertions} gitRemoteHelper
- * @param {string} owner
- * @param {string} repo
- * @param {string} sha
- * @return {Promise<Status>}
- */
-export function waitForSuccessOf(gitRemoteHelper: GitHubAssertions,
-                                 owner: string, repo: string,
-                                 sha: string,
-                                 test: (s: Status) => boolean,
-                                 opts?: AssertOptions): Promise<Status> {
-    return gitRemoteHelper.waitForStatusOf(
-        new GitHubRepoRef(owner, repo, sha),
-        test,
-        "success",
-        opts || allow(seconds(40)).withRetries(10),
-    );
-}
-
-export async function verifyCodeReactionSuccess(gitRemoteHelper: GitHubAssertions,
-                                                repo: { owner: string, repo: string, sha: string }): Promise<Status> {
-    const codeReactionStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
+export async function verifyCodeReactionState(gitRemoteHelper: GitHubAssertions,
+                                              repo: { owner: string, repo: string, sha: string },
+                                              state: State): Promise<Status> {
+    const codeReactionStatus = await gitRemoteHelper.waitForStatusOf(
+        new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
         s => s.context.includes("react"),
+        state,
         allow(seconds(15)).withRetries(8),
     );
     logger.info("Found code reaction success status");
     return codeReactionStatus;
 }
 
-export async function verifyReviewSuccess(gitRemoteHelper: GitHubAssertions,
-                                          repo: { owner: string, repo: string, sha: string }): Promise<Status> {
-    const reviewStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
+export async function verifyReviewState(gitRemoteHelper: GitHubAssertions,
+                                        repo: { owner: string, repo: string, sha: string },
+                                        state: State): Promise<Status> {
+    const reviewStatus = await gitRemoteHelper.waitForStatusOf(
+        new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
         s => s.context.includes("review"),
+        state,
         allow(seconds(15)).withRetries(8),
     );
     logger.info("Found code review success status");
     return reviewStatus;
 }
 
-export async function verifySdmBuildSuccess(gitRemoteHelper: GitHubAssertions,
-                                            repo: { owner: string, repo: string, sha: string }): Promise<Status> {
-    const buildStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
+export async function verifySdmBuildState(gitRemoteHelper: GitHubAssertions,
+                                          repo: { owner: string, repo: string, sha: string },
+                                          state: State): Promise<Status> {
+    const buildStatus = await gitRemoteHelper.waitForStatusOf(
+        new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
         s => s.context.includes("build"),
+        state,
         allow(seconds(80)).withRetries(10),
     );
     logger.info("Found build success status");
@@ -78,17 +66,21 @@ export interface DeploymentStatuses {
     endpointStatus: Status;
 }
 
-export async function verifySdmDeploy(gitRemoteHelper: GitHubAssertions,
-                                      repo: { owner: string, repo: string, sha: string }): Promise<DeploymentStatuses> {
-
-    const deployStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
+export async function verifySdmDeploySuccess(gitRemoteHelper: GitHubAssertions,
+                                             repo: { owner: string, repo: string, sha: string }): Promise<DeploymentStatuses> {
+    const grr = new GitHubRepoRef(repo.owner, repo.repo, repo.sha);
+    const deployStatus = await gitRemoteHelper.waitForStatusOf(
+        grr,
         s => s.context.includes("deploy"),
+        "success",
         allow(seconds(80)).withRetries(10),
     );
     logger.info("Found deploy success status");
 
-    const endpointStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, repo.sha,
+    const endpointStatus = await await gitRemoteHelper.waitForStatusOf(
+        grr,
         s => s.context.includes("endpoint"),
+        "success",
         allow(seconds(5)).withRetries(2),
     );
     logger.info("Found endpoint success status");

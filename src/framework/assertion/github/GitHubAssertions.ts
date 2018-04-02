@@ -89,7 +89,7 @@ export class GitHubAssertions implements GitRemoteAssertions {
                 if (!it) {
                     throw new Error(`Not there: Status satisfying [${test}] required on commit ${id.sha}: Found ` + statusesString(statuses));
                 }
-                if (it.state === "failure") {
+                if (it.state === "failure" && state !== "failure") {
                     throw new FatalError(`Failed state: Status satisfying [${test}] required on commit ${id.sha}: Found ` + statusesString(statuses));
                 }
                 if (it.state !== state) {
