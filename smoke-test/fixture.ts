@@ -16,9 +16,12 @@
 
 import { SmokeTestConfig } from "../src/framework/config";
 
-export const TestConfig: SmokeTestConfig = {
+export const EnvironmentConfig: SmokeTestConfig = {
 
     atomistTeamId: process.env.ATOMIST_TEAMS || "T5964N9B7",
+
+    atomistTeamName: process.env.ATOMIST_TEAM_NAME || "Atomist",
+
     baseEndpoint: "http://localhost:2866",
 
     user: "admin",

@@ -17,7 +17,11 @@
 import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
 
 export interface SmokeTestConfig {
+    
     atomistTeamId: string;
+
+    atomistTeamName: string;
+
     baseEndpoint: string;
 
     user: string;
