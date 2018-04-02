@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-import { HandlerResult, logger, MappedParameters } from "@atomist/automation-client";
+import { HandlerResult, logger } from "@atomist/automation-client";
 import { Arg, Secret } from "@atomist/automation-client/internal/invoker/Payload";
 
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import * as _ from "lodash";
 import { SmokeTestConfig } from "../config";
 
 import * as assert from "power-assert";
 import { hasOwnProperty } from "tslint/lib/utils";
+import { postToSdm } from "./httpInvoker";
 
+/**
+ * Allow params to be expressed in an object for convenience
+ */
 export interface Params {
 
     [propName: string]: string | number;
@@ -69,40 +71,6 @@ export async function invokeCommandHandler(config: SmokeTestConfig,
     return resp.data;
 }
 
-function postToSdm(config: SmokeTestConfig, relativePath: string, data: any) {
-    let url = `${config.baseEndpoint}/${relativePath}`;
-    if (relativePath.startsWith("/")) {
-        url = `${config.baseEndpoint}${relativePath}`;
-    }
-    logger.debug("Posting to %s with payload %j", url, data);
-    return axios.post(url, data, automationServerAuthHeaders(config))
-        .then(logResponse(url), interpretSdmResponse(config, url));
-}
-
-function logResponse(url: string) {
-    return (resp: AxiosResponse): AxiosResponse => {
-        logger.debug(`Response from %s was %d, data %j`, url, resp.status, resp.data);
-        return resp;
-    };
-}
-
-function interpretSdmResponse(config: SmokeTestConfig, url: string) {
-    return (err: AxiosError): never => {
-        logger.error("Error posting to %s: %s", url, err.message);
-        if (err.message.includes("ECONNREFUSED")) {
-            const linkThatDemonstratesWhyTheSdmMightNotBeListening =
-                "https://github.com/atomist/github-sdm/blob/acd5f89cb2c3e96fa47ef85b32b2028ea2e045fb/src/atomist.config.ts#L62";
-            logger.error("The SDM is not running or is not accepting connections.\n" +
-                "If it's running, check its environment variables. See: " + linkThatDemonstratesWhyTheSdmMightNotBeListening);
-            throw new Error("Unable to connect to the SDM at " + config.baseEndpoint);
-        }
-        if (err.response.status === 401) {
-            throw new Error(`Status 401 trying to contact the SDM. You are connecting as: [ ${config.user}:${config.password} ]`);
-        }
-        throw err;
-    };
-}
-
 export function editorOneInvocation(editorCommandName: string,
                                     rr: RemoteRepoRef,
                                     parameters: Params): CommandHandlerInvocation {
@@ -114,20 +82,6 @@ export function editorOneInvocation(editorCommandName: string,
             {name: "targets.repo", value: rr.repo},
         ],
         secrets: [],
-    };
-}
-
-export function automationServerAuthHeaders(config: SmokeTestConfig): AxiosRequestConfig {
-    return {
-        headers: {
-            "content-type": "application/json",
-            "Cache-Control": "no-cache",
-            // Authorization: `Bearer ${config.jwt}`,
-        },
-        auth: {
-            username: config.user,
-            password: config.password,
-        },
     };
 }
 
