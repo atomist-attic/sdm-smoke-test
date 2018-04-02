@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HandlerResult, logger } from "@atomist/automation-client";
+import { HandlerResult, logger, MappedParameters } from "@atomist/automation-client";
 import { Arg, Secret } from "@atomist/automation-client/internal/invoker/Payload";
 
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
@@ -41,16 +41,28 @@ export async function invokeCommandHandler(config: SmokeTestConfig,
                                            invocation: CommandHandlerInvocation): Promise<HandlerResult> {
     assert(!!config, "Config must be provided");
     assert(!!config.baseEndpoint, "Base endpoint must be provided: saw " + JSON.stringify(config));
-    const url = `/command/${_.kebabCase(invocation.name)}`;
+    const url = `/command`;
     const data = {
+        command: invocation.name,
         parameters: propertiesToArgs(invocation.parameters),
-        mapped_parameters: invocation.mappedParameters,
+        mapped_parameters: (invocation.mappedParameters || []).concat([
+            {name: "slackTeam", value: config.atomistTeamId},
+            // TODO fix this
+            {name: "target.webhookUrl", value: "foo"},
+            {name: "target.owner", value: config.githubOrg},
+
+        ]),
         secrets: (invocation.secrets || []).concat([
             {uri: "github://user_token?scopes=repo,user:email,read:user", value: process.env.GITHUB_TOKEN},
         ]),
-        command: invocation.name,
+        correlation_id: "test-" + new Date().getTime(),
+        api_version: "1",
+        team: {
+            id: config.atomistTeamId,
+            name: config.atomistTeamName,
+        },
     };
-    logger.debug(`Hitting ${url} to test command ${invocation.name}`);
+    logger.info("Hitting %s to test command %s using %j", url, invocation.name, data);
     const resp = await postToSdm(config, url, data);
     assert(resp.data.code === 0,
         "Command handler did not succeed. Returned: " + JSON.stringify(resp.data, null, 2));
@@ -109,6 +121,7 @@ export function automationServerAuthHeaders(config: SmokeTestConfig): AxiosReque
     return {
         headers: {
             "content-type": "application/json",
+            "Cache-Control": "no-cache",
             // Authorization: `Bearer ${config.jwt}`,
         },
         auth: {
@@ -117,17 +130,6 @@ export function automationServerAuthHeaders(config: SmokeTestConfig): AxiosReque
         },
     };
 }
-
-/*
-export async function getBearerToken(config: SmokeTestConfig): Promise<string> {
-    // curl -u admin:100dd8e5-a154-4598-b124-879abb89df62 -v localhost:2866/info
-    const url = config.baseEndpoint + "/info";
-    const res = await axios.get(url, {
-
-    })
-
-}
-*/
 
 function propertiesToArgs(o: any): Arg[] {
     const args = [];

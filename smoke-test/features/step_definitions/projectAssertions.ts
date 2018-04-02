@@ -15,16 +15,17 @@
  */
 
 import { Then } from "cucumber";
-import { stringify } from "querystring";
-import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
-import { EnvironmentConfig } from "../../fixture";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { logger } from "@atomist/automation-client";
 
-import * as assert from "power-assert";
+// Note: We cannot use arrow functions as binding doesn't work
 
-Then("SDM should describe itself", async function() {
-    const handlerResult = await invokeCommandHandler(EnvironmentConfig, {
-        name: "SelfDescribe",
-        parameters: {},
-    });
-    assert(handlerResult.message.includes("brilliant"), "Not brilliant: " + stringify(handlerResult));
+/**
+ * Definitions to make assertions about projects
+ */
+
+Then("project {string} should exist", async function(name) {
+    logger.info("Checking that project '%s' exists", name);
+    await this.gitRemoteHelper.clone(
+        new GitHubRepoRef(this.config.githubOrg, name), {retries: 2});
 });
