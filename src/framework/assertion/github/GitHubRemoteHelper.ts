@@ -16,10 +16,10 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
+import { RemoteRepoRef, RepoId } from "@atomist/automation-client/operations/common/RepoId";
 import axios, { AxiosRequestConfig } from "axios";
 import { RepoBranchTips } from "../../../typings/types";
-import { Dated, GitRemoteAssertions } from "../GitRemoteAssertions";
+import { Dated, GitRemoteHelper } from "../GitRemoteHelper";
 
 import * as assert from "power-assert";
 
@@ -44,7 +44,7 @@ export interface Status {
     context?: string;
 }
 
-export class GitHubAssertions implements GitRemoteAssertions {
+export class GitHubRemoteHelper implements GitRemoteHelper {
 
     private readonly credentials: TokenCredentials;
 
@@ -61,7 +61,7 @@ export class GitHubAssertions implements GitRemoteAssertions {
                           opts?: AssertOptions): Promise<Status[]> {
         assert(!!id.sha, "Sha must be provided in " + JSON.stringify(id));
         return doWithOptions(
-            () => listStatuses(this.credentials.token, id as GitHubRepoRef),
+            () => this.listStatuses(id as GitHubRepoRef),
             `get statuses for ${id.sha}`,
             opts,
         );
@@ -114,7 +114,7 @@ export class GitHubAssertions implements GitRemoteAssertions {
             const url = `${(id as GitHubRepoRef).apiBase}/repos/${id.owner}/${id.repo}/branches/${id.branch}`;
             logger.debug(`Request to '${url}' to get commits`);
             const resp = await doWithOptions(
-                () => axios.get(url, authHeaders(this.credentials.token)),
+                () => axios.get(url, this.authHeaders),
                 `get commits for ${JSON.stringify(id)} d `,
                 opts,
             );
@@ -135,24 +135,34 @@ export class GitHubAssertions implements GitRemoteAssertions {
             return undefined;
         }
     }
-}
 
-function authHeaders(token: string): AxiosRequestConfig {
-    return token ? {
+    public async deleteRepo(id: RepoId): Promise<boolean> {
+        // TODO what about GHE
+        const grr = new GitHubRepoRef(id.owner, id.repo);
+        try {
+            await axios.delete(`${grr.apiBase}/repos/${grr.owner}/${grr.repo}`, this.authHeaders);
+            return true;
+        } catch (err) {
+            logger.warn("Error deleting repo %j: %s", id, err.message);
+            return false;
+        }
+    }
+
+    private get authHeaders(): AxiosRequestConfig {
+        return {
             headers: {
                 Authorization:
-                    `token ${token}`
-                ,
+                    `token ${this.credentials.token}`,
             },
-        }
-        : {};
-}
+        };
+    }
 
-export function listStatuses(token: string, rr: GitHubRepoRef): Promise<Status[]> {
-    const config = authHeaders(token);
-    const url = `${rr.apiBase}/repos/${rr.owner}/${rr.repo}/commits/${rr.sha}/statuses`;
-    return axios.get(url, config)
-        .then(ap => ap.data);
+    private listStatuses(rr: GitHubRepoRef): Promise<Status[]> {
+        const url = `${rr.apiBase}/repos/${rr.owner}/${rr.repo}/commits/${rr.sha}/statuses`;
+        return axios.get(url, this.authHeaders)
+            .then(ap => ap.data);
+    }
+
 }
 
 function statusesString(statuses: Status[]) {

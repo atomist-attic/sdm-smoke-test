@@ -22,6 +22,8 @@ import {
     verifyCodeReactionState, verifyReviewState,
     verifySdmBuildState, verifySdmDeploySuccess
 } from "../../../src/framework/assertion/github/statusUtils";
+import { GitRemoteHelper } from "../../../src/framework/assertion/GitRemoteHelper";
+import { GitHubRemoteHelper } from "../../../src/framework/assertion/github/GitHubRemoteHelper";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
@@ -33,7 +35,7 @@ Then("build should succeed", {timeout: 60 * 1000}, async function () {
     await verifySdmBuildState(this.gitRemoteHelper, this.focusRepo, "success");
 });
 
-Then("build should fail", {timeout: 60 * 1000}, async function() {
+Then("build should fail", {timeout: 60 * 1000}, async function () {
     await verifySdmBuildState(this.gitRemoteHelper, this.focusRepo, "failure");
 });
 
@@ -64,8 +66,10 @@ Then("it should deploy to staging", {timeout: 60 * 1000}, async function () {
 });
 
 Then("it should be immaterial", {timeout: 20 * 1000}, async function () {
-    const immaterialStatus = await this.gitRemoteHelper.waitForSuccessOf(this.gitRemoteHelper,
-        this.focusRepo.owner, this.focusRepo.repo, this.focusRepo.sha,
-        s => s.context.includes("immaterial"));
+    const immaterialStatus = await (this.gitRemoteHelper as GitHubRemoteHelper).waitForStatusOf(
+        this.focusRepo,
+        s => s.context.includes("immaterial"),
+        "success",
+    );
     logger.info("Found required immaterial status %j", immaterialStatus);
 });

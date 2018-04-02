@@ -18,11 +18,11 @@ import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { allow, seconds } from "../AssertOptions";
 import { verifyGet } from "../util/endpoint";
-import { GitHubAssertions, State, Status } from "./GitHubAssertions";
+import { GitHubRemoteHelper, State, Status } from "./GitHubRemoteHelper";
 
 import * as assert from "power-assert";
 
-export async function verifyCodeReactionState(gitRemoteHelper: GitHubAssertions,
+export async function verifyCodeReactionState(gitRemoteHelper: GitHubRemoteHelper,
                                               repo: { owner: string, repo: string, sha: string },
                                               state: State): Promise<Status> {
     const codeReactionStatus = await gitRemoteHelper.waitForStatusOf(
@@ -35,7 +35,7 @@ export async function verifyCodeReactionState(gitRemoteHelper: GitHubAssertions,
     return codeReactionStatus;
 }
 
-export async function verifyReviewState(gitRemoteHelper: GitHubAssertions,
+export async function verifyReviewState(gitRemoteHelper: GitHubRemoteHelper,
                                         repo: { owner: string, repo: string, sha: string },
                                         state: State): Promise<Status> {
     const reviewStatus = await gitRemoteHelper.waitForStatusOf(
@@ -48,7 +48,7 @@ export async function verifyReviewState(gitRemoteHelper: GitHubAssertions,
     return reviewStatus;
 }
 
-export async function verifySdmBuildState(gitRemoteHelper: GitHubAssertions,
+export async function verifySdmBuildState(gitRemoteHelper: GitHubRemoteHelper,
                                           repo: { owner: string, repo: string, sha: string },
                                           state: State): Promise<Status> {
     const buildStatus = await gitRemoteHelper.waitForStatusOf(
@@ -66,7 +66,7 @@ export interface DeploymentStatuses {
     endpointStatus: Status;
 }
 
-export async function verifySdmDeploySuccess(gitRemoteHelper: GitHubAssertions,
+export async function verifySdmDeploySuccess(gitRemoteHelper: GitHubRemoteHelper,
                                              repo: { owner: string, repo: string, sha: string }): Promise<DeploymentStatuses> {
     const grr = new GitHubRepoRef(repo.owner, repo.repo, repo.sha);
     const deployStatus = await gitRemoteHelper.waitForStatusOf(

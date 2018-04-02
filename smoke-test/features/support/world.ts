@@ -15,12 +15,13 @@
  */
 
 import { setWorldConstructor } from "cucumber";
-import { GitHubAssertions } from "../../../src/framework/assertion/github/GitHubAssertions";
+import { GitHubRemoteHelper } from "../../../src/framework/assertion/github/GitHubRemoteHelper";
 import { SmokeTestConfig } from "../../../src/framework/config";
 import { EnvironmentSmokeTestConfig } from "../../../src/framework/EnvironmentSmokeTestConfig";
 
 import { logger } from "@atomist/automation-client";
 import * as assert from "power-assert";
+import { RepoId, RepoRef } from "@atomist/automation-client/operations/common/RepoId";
 
 export interface Repo {
     owner: string;
@@ -39,7 +40,9 @@ export class SmokeTestWorld {
 
     public readonly config: SmokeTestConfig = EnvironmentSmokeTestConfig;
 
-    public readonly gitRemoteHelper = new GitHubAssertions(this.config.credentials);
+    public readonly gitRemoteHelper = new GitHubRemoteHelper(this.config.credentials);
+
+    private readonly reposCreated: RepoId[] = [];
 
     /**
      * Set the focus repo
@@ -67,6 +70,19 @@ export class SmokeTestWorld {
         return this.setFocus(focus);
     }
 
+    public registerCreated(rr: RepoId) {
+        this.reposCreated.push(rr);
+    }
+
+    public async cleanup() {
+        logger.info("%d repos to clean up", this.reposCreated.length);
+        return Promise.all(
+            this.reposCreated.map(async id => {
+                await this.gitRemoteHelper.deleteRepo(id);
+                logger.info("Deleting repo %j", id);
+            }),
+        );
+    }
 }
 
 function key(name: string): string {

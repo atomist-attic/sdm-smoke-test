@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
+import { RemoteRepoRef, RepoId } from "@atomist/automation-client/operations/common/RepoId";
 import { RepoBranchTips } from "../../typings/types";
 
 import Commit = RepoBranchTips.Commit;
@@ -25,7 +25,7 @@ export interface Dated {
     date: Date;
 }
 
-export interface GitRemoteAssertions {
+export interface GitRemoteHelper {
 
     assertRepoExists(params: { owner: string, name: string, opts?: AssertOptions }): Promise<any>;
 
@@ -34,4 +34,6 @@ export interface GitRemoteAssertions {
 
     clone(id: RemoteRepoRef,
           opts?: AssertOptions): Promise<GitProject>;
+
+    deleteRepo(id: RepoId): Promise<boolean>;
 }

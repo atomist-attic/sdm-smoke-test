@@ -16,25 +16,19 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { Given, When } from "cucumber";
+import { When } from "cucumber";
 import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 
-When("we create a new Spring Boot Project", async function() {
-    const RepoToCreate = "x"
-    const repo = GitHubRepoRef.from({owner: this.config.githubOrg, repo: RepoToCreate});
+When(/we create a new Spring Boot Project named (.*)/, {timeout: 45 * 1000}, async function(repo) {
+    const grr = GitHubRepoRef.from({owner: this.config.githubOrg, repo});
+    logger.info("Creating project named %s...", repo);
+    this.registerCreated(grr);
     await invokeCommandHandler(this.config,
         {
             name: "springBootGenerator",
             parameters: {
-                "target.repo": RepoToCreate,
+                "target.repo": repo,
                 "rootPackage": "com.atomist"},
         });
     logger.info("Handler returned. Waiting for GitHub...");
-
-    //const createdProject = await gitRemoteHelper.clone(repo, {retries: 5});
-
-    // // Now verify context
-    // const immaterialStatus = await waitForSuccessOf(gitRemoteHelper, repo.owner, repo.repo, gitStatus.sha,
-    //     s => s.context.includes("immaterial"));
-    // logger.info("Found required immaterial status %j", immaterialStatus);
 });

@@ -15,6 +15,9 @@
  */
 
 import { Given, Then, When } from "cucumber";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { logger } from "@atomist/automation-client";
+import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
@@ -23,6 +26,17 @@ import { Given, Then, When } from "cucumber";
  */
 
 // Save the current sha as name
-When(/try to upgrade Spring Boot to (.*)/, function(version) {
-    throw new Error("Implement Spring Boot upgrade using command");
+When(/try to upgrade Spring Boot to (.*)/, async function(version) {
+    const grr = GitHubRepoRef.from(this.focusRepo);
+    logger.info("Upgrading Spring boot to %s on %s...", version, this.focusRepo.repo);
+    this.registerCreated(grr);
+    await invokeCommandHandler(this.config,
+        {
+            name: "tryToUpgradeSpringBoot",
+            parameters: {
+                "target.repo": this.focusRepo.repo,
+                "desiredBootVersion": version,
+            },
+        });
+    logger.info("Handler returned. Waiting for GitHub...");
 });

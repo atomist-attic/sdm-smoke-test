@@ -32,8 +32,18 @@ export function postToSdm(config: SmokeTestConfig, relativePath: string, data: a
     if (relativePath.startsWith("/")) {
         url = `${config.baseEndpoint}${relativePath}`;
     }
-    logger.debug("Posting to %s with payload %j", url, data);
+    logger.debug("POST to %s with payload %j", url, data);
     return axios.post(url, data, automationServerAuthHeaders(config))
+        .then(logResponse(url), interpretSdmResponse(config, url));
+}
+
+export function sdmGet(config: SmokeTestConfig, relativePath: string): AxiosPromise {
+    let url = `${config.baseEndpoint}/${relativePath}`;
+    if (relativePath.startsWith("/")) {
+        url = `${config.baseEndpoint}${relativePath}`;
+    }
+    logger.debug("GET %s");
+    return axios.get(url, automationServerAuthHeaders(config))
         .then(logResponse(url), interpretSdmResponse(config, url));
 }
 
@@ -46,7 +56,7 @@ function logResponse(url: string) {
 
 function interpretSdmResponse(config: SmokeTestConfig, url: string) {
     return (err: AxiosError): never => {
-        logger.error("Error posting to %s: %s", url, err.message);
+        logger.error("Error accessing %s: %s", url, err.message);
         if (err.message.includes("ECONNREFUSED")) {
             const linkThatDemonstratesWhyTheSdmMightNotBeListening =
                 "https://github.com/atomist/github-sdm/blob/acd5f89cb2c3e96fa47ef85b32b2028ea2e045fb/src/atomist.config.ts#L62";
