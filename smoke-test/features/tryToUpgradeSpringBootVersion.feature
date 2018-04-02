@@ -16,4 +16,4 @@ Feature: Try to upgrade Spring Boot version
   Scenario: Try to upgrade to same version
     Given project losgatos1
     When try to upgrade Spring Boot to 1.5.4.RELEASE
-    # Then what?
+    # Then how do we know nothing happened, without seeing the message?
