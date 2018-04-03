@@ -30,7 +30,7 @@ import * as assert from "power-assert";
  * Definitions to perform edits on GitHub projects to kick off behavior
  */
 
-When("README is changed on master", {timeout: 10 * 4000}, async function() {
+When("README is changed on master", {timeout: 80 * 1000}, async function() {
     const repo = GitHubRepoRef.from(this.focusRepo);
 
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
