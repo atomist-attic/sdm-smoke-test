@@ -74,6 +74,7 @@ export class SmokeTestWorld {
         this.reposCreated.push(rr);
     }
 
+    // TODO also clean up created branches
     public async cleanup() {
         logger.info("%d repos to clean up", this.reposCreated.length);
         return Promise.all(

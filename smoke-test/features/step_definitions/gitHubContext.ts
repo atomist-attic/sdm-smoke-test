@@ -56,14 +56,14 @@ Then("it should deploy locally", {timeout: 60 * 1000}, async function() {
     const statuses = await verifySdmDeploySuccess(this.gitRemoteHelper,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
     assert(statuses.deployStatus.context.includes("local"),
-        `${statuses.deployStatus} does not include 'local'`);
+        `context ${statuses.deployStatus.context} does not include 'local'`);
 });
 
 Then("it should deploy to staging", {timeout: 60 * 1000}, async function() {
     const statuses = await verifySdmDeploySuccess(this.gitRemoteHelper,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
     assert(statuses.deployStatus.context.includes("staging"),
-        `${statuses.deployStatus} does not include 'staging'`);
+        `context ${statuses.deployStatus.context} does not include 'staging'`);
 });
 
 Then("it should be immaterial", {timeout: 20 * 1000}, async function() {
