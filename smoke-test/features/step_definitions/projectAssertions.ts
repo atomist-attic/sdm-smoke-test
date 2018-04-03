@@ -26,13 +26,13 @@ import * as assert from "power-assert";
  * Definitions to make assertions about projects
  */
 
-Then("project should exist", {timeout: 30 * 1000}, async function () {
+Then("project should exist", {timeout: 30 * 1000}, async function() {
     logger.info("Checking that focus project %j exists", this.focusRepo);
     await this.gitRemoteHelper.clone(
         new GitHubRepoRef(this.focusRepo.owner, this.focusRepo.repo), {retries: 2});
 });
 
-When(/project (.*) does not exist/, {timeout: 30 * 1000}, async function (name) {
+When(/project (.*) does not exist/, {timeout: 30 * 1000}, async function(name) {
     logger.info("Checking that project %s does not exist", this.focusRepo);
     try {
         await this.gitRemoteHelper.clone(
@@ -43,7 +43,7 @@ When(/project (.*) does not exist/, {timeout: 30 * 1000}, async function (name) 
     }
 });
 
-Then(/project should have (.*) topic/, {timeout: 40 * 1000}, async function (topic) {
+Then(/project should have (.*) topic/, {timeout: 40 * 1000}, async function(topic) {
     const topics = await this.gitRemoteHelper.waitForTopic(this.focusRepo, topic, {retries: 10});
     assert(topics.includes(topic), `Topics [${topics}] did not include [${topic}]`);
 });
