@@ -22,7 +22,7 @@ import { Given, Then, When } from "cucumber";
  * Definitions to set and capture focus project
  */
 
-Given(/project (.*)/, function(project) {
+Given(/existing project (.*)/, function(project) {
     this.setFocus( {owner: this.config.githubOrg, repo: project, sha: undefined});
 });
 

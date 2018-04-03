@@ -15,7 +15,7 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { GitHubRepoRef, isGitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RemoteRepoRef, RepoId } from "@atomist/automation-client/operations/common/RepoId";
 import axios, { AxiosRequestConfig } from "axios";
 import { RepoBranchTips } from "../../../typings/types";
@@ -146,6 +146,27 @@ export class GitHubRemoteHelper implements GitRemoteHelper {
             logger.warn("Error deleting repo %j: %s", id, err.message);
             return false;
         }
+    }
+
+    public async waitForTopic(rr: RemoteRepoRef, topic: string, opts?: AssertOptions): Promise<boolean> {
+        const headers = {
+            headers: {
+                ...this.authHeaders.headers,
+                Accept: "application/vnd.github.mercy-preview+json",
+            },
+        };
+        const grr = isGitHubRepoRef(rr) ? rr : new GitHubRepoRef(rr.owner, rr.repo, rr.sha);
+        const url = `${grr.apiBase}/repos/${grr.owner}/${grr.repo}/topics`;
+        return doWithOptions(
+            async () => {
+                const topics = await axios.get(url, headers);
+                if (!topics.data.names.includes(topic)) {
+                    throw new Error(`Cannot see topic '${topic}' yet on ${JSON.stringify(rr)}`);
+                }
+                return topics.data.names;
+            },
+            `look for topic '${topic}' on ${JSON.stringify(rr)})`,
+            opts);
     }
 
     private get authHeaders(): AxiosRequestConfig {

@@ -23,20 +23,13 @@ import { logger } from "@atomist/automation-client";
 import { RepoId, RepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import * as assert from "power-assert";
 
-export interface Repo {
-    owner: string;
-    repo: string;
-    branch?: string;
-    sha: string;
-}
-
 /**
  * World with basic setup and enabling focus repo to be set,
  * saved and loaded.
  */
 export class SmokeTestWorld {
 
-    public focusRepo: Repo;
+    public focusRepo: RepoRef;
 
     public readonly config: SmokeTestConfig = EnvironmentSmokeTestConfig;
 
@@ -48,7 +41,7 @@ export class SmokeTestWorld {
      * Set the focus repo
      * @param {Repo} repo
      */
-    public setFocus(repo: Repo): Repo {
+    public setFocus(repo: RepoRef): RepoRef {
         this.focusRepo = repo;
         logger.info("Set focus project to %j", repo);
         return this.focusRepo;
@@ -64,7 +57,7 @@ export class SmokeTestWorld {
         logger.info("Saved focus repo %j as %s", this.focusRepo, name);
     }
 
-    public load(name: string): Repo {
+    public load(name: string): RepoRef {
         const focus = this[key(name)];
         assert(!!focus, `No repo saved as [${name}]`);
         return this.setFocus(focus);
@@ -72,6 +65,7 @@ export class SmokeTestWorld {
 
     public registerCreated(rr: RepoId) {
         this.reposCreated.push(rr);
+        this.focusRepo = rr;
     }
 
     // TODO also clean up created branches

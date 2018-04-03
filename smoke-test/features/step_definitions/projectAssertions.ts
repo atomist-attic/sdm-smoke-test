@@ -16,7 +16,9 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { Then } from "cucumber";
+import { Then, When } from "cucumber";
+
+import * as assert from "power-assert";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
@@ -24,8 +26,24 @@ import { Then } from "cucumber";
  * Definitions to make assertions about projects
  */
 
-Then("project {string} should exist", async function(name) {
-    logger.info("Checking that project '%s' exists", name);
+Then("project should exist", {timeout: 30 * 1000}, async function () {
+    logger.info("Checking that focus project %j exists", this.focusRepo);
     await this.gitRemoteHelper.clone(
-        new GitHubRepoRef(this.config.githubOrg, name), {retries: 2});
+        new GitHubRepoRef(this.focusRepo.owner, this.focusRepo.repo), {retries: 2});
+});
+
+When(/project (.*) does not exist/, {timeout: 30 * 1000}, async function (name) {
+    logger.info("Checking that project %s does not exist", this.focusRepo);
+    try {
+        await this.gitRemoteHelper.clone(
+            new GitHubRepoRef(this.config.githubOrg, name));
+        assert.fail(`Project ${name} should not exist`);
+    } catch (err) {
+        // OK
+    }
+});
+
+Then(/project should have (.*) topic/, {timeout: 40 * 1000}, async function (topic) {
+    const topics = await this.gitRemoteHelper.waitForTopic(this.focusRepo, topic, {retries: 10});
+    assert(topics.includes(topic), `Topics [${topics}] did not include [${topic}]`);
 });

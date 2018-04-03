@@ -13,7 +13,7 @@ Feature: Java HTTP service support
     Then it should be immaterial
 
   Scenario: Java change on master
-    Given project losgatos1
+    Given existing project losgatos1
     When Java is changed on master
     Then build should succeed
     Then reviews should succeed
@@ -21,13 +21,13 @@ Feature: Java HTTP service support
     Then it should deploy to staging
 
   Scenario: Java change on new branch
-    Given project losgatos1
+    Given existing project losgatos1
     When Java is changed on a new branch
     Then reactions should succeed
     Then it should deploy locally
 
   Scenario: Concurrent branch deploys
-    Given project losgatos1
+    Given existing project losgatos1
     When Java is changed on a new branch
     When save as b1
     When Java is changed on a new branch

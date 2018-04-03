@@ -16,7 +16,7 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { When } from "cucumber";
+import { Then, When } from "cucumber";
 import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 
 When(/we create a new Spring Boot Project named (.*)/, {timeout: 45 * 1000}, async function(repo) {
