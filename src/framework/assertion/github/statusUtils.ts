@@ -22,6 +22,18 @@ import { GitHubRemoteHelper, State, Status } from "./GitHubRemoteHelper";
 
 import * as assert from "power-assert";
 
+export async function verifyImmaterial(gitRemoteHelper: GitHubRemoteHelper,
+                                       repo: { owner: string, repo: string, sha: string }): Promise<Status> {
+    const codeReactionStatus = await gitRemoteHelper.waitForStatusOf(
+        new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
+        s => s.context.includes("immaterial"),
+        "success",
+        allow(seconds(15)).withRetries(3),
+    );
+    logger.info("Found code reaction success status");
+    return codeReactionStatus;
+}
+
 export async function verifyCodeReactionState(gitRemoteHelper: GitHubRemoteHelper,
                                               repo: { owner: string, repo: string, sha: string },
                                               state: State): Promise<Status> {
@@ -29,7 +41,7 @@ export async function verifyCodeReactionState(gitRemoteHelper: GitHubRemoteHelpe
         new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
         s => s.context.includes("react"),
         state,
-        allow(seconds(15)).withRetries(8),
+        allow(seconds(20)).withRetries(10),
     );
     logger.info("Found code reaction success status");
     return codeReactionStatus;
@@ -42,7 +54,7 @@ export async function verifyReviewState(gitRemoteHelper: GitHubRemoteHelper,
         new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
         s => s.context.includes("review"),
         state,
-        allow(seconds(15)).withRetries(8),
+        allow(seconds(20)).withRetries(10),
     );
     logger.info("Found code review success status");
     return reviewStatus;
@@ -55,7 +67,7 @@ export async function verifySdmBuildState(gitRemoteHelper: GitHubRemoteHelper,
         new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
         s => s.context.includes("build"),
         state,
-        allow(seconds(80)).withRetries(10),
+        allow(seconds(80)).withRetries(15),
     );
     logger.info("Found build success status");
     return buildStatus;
@@ -73,7 +85,7 @@ export async function verifySdmDeploySuccess(gitRemoteHelper: GitHubRemoteHelper
         grr,
         s => s.context.includes("deploy"),
         "success",
-        allow(seconds(80)).withRetries(10),
+        allow(seconds(80)).withRetries(15),
     );
     logger.info("Found deploy success status");
 
@@ -81,7 +93,7 @@ export async function verifySdmDeploySuccess(gitRemoteHelper: GitHubRemoteHelper
         grr,
         s => s.context.includes("endpoint"),
         "success",
-        allow(seconds(5)).withRetries(2),
+        allow(seconds(5)).withRetries(5),
     );
     logger.info("Found endpoint success status");
 

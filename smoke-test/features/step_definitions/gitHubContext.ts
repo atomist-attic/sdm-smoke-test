@@ -19,11 +19,12 @@ import { Then } from "cucumber";
 
 import * as assert from "power-assert";
 import {
-    verifyCodeReactionState, verifyReviewState,
-    verifySdmBuildState, verifySdmDeploySuccess
+    verifyCodeReactionState,
+    verifyImmaterial,
+    verifyReviewState,
+    verifySdmBuildState,
+    verifySdmDeploySuccess
 } from "../../../src/framework/assertion/github/statusUtils";
-import { GitRemoteHelper } from "../../../src/framework/assertion/GitRemoteHelper";
-import { GitHubRemoteHelper } from "../../../src/framework/assertion/github/GitHubRemoteHelper";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
@@ -66,10 +67,6 @@ Then("it should deploy to staging", {timeout: 60 * 1000}, async function () {
 });
 
 Then("it should be immaterial", {timeout: 20 * 1000}, async function () {
-    const immaterialStatus = await (this.gitRemoteHelper as GitHubRemoteHelper).waitForStatusOf(
-        this.focusRepo,
-        s => s.context.includes("immaterial"),
-        "success",
-    );
+    const immaterialStatus = await verifyImmaterial(this.gitRemoteHelper, this.focusRepo);
     logger.info("Found required immaterial status %j", immaterialStatus);
 });
