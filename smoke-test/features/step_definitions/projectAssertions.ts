@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Then } from "cucumber";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { logger } from "@atomist/automation-client";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { Then } from "cucumber";
 
 // Note: We cannot use arrow functions as binding doesn't work
 

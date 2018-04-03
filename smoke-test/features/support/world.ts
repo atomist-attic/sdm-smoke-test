@@ -20,8 +20,8 @@ import { SmokeTestConfig } from "../../../src/framework/config";
 import { EnvironmentSmokeTestConfig } from "../../../src/framework/EnvironmentSmokeTestConfig";
 
 import { logger } from "@atomist/automation-client";
-import * as assert from "power-assert";
 import { RepoId, RepoRef } from "@atomist/automation-client/operations/common/RepoId";
+import * as assert from "power-assert";
 
 export interface Repo {
     owner: string;

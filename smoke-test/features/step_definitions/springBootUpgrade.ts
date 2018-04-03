@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Given, Then, When } from "cucumber";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { logger } from "@atomist/automation-client";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { Given, Then, When } from "cucumber";
 import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 
 // Note: We cannot use arrow functions as binding doesn't work

@@ -89,7 +89,7 @@ export async function verifySdmDeploySuccess(gitRemoteHelper: GitHubRemoteHelper
     );
     logger.info("Found deploy success status");
 
-    const endpointStatus = await await gitRemoteHelper.waitForStatusOf(
+    const endpointStatus = await gitRemoteHelper.waitForStatusOf(
         grr,
         s => s.context.includes("endpoint"),
         "success",

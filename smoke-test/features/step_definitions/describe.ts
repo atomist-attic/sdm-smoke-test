@@ -16,8 +16,8 @@
 
 import { Then } from "cucumber";
 import { stringify } from "querystring";
-import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { EnvironmentSmokeTestConfig } from "../../../src/framework/EnvironmentSmokeTestConfig";
+import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 
 import * as assert from "power-assert";
 

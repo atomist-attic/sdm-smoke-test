@@ -18,7 +18,6 @@ import { SmokeTestConfig } from "./config";
 
 /**
  * Load config from environment
- * @type {{atomistTeamId: (string | any | string); atomistTeamName: (string | any | string); baseEndpoint: string; user: string; password: (string | any); githubOrg: (string | any | string); credentials: {token: (string | any)}}}
  */
 export const EnvironmentSmokeTestConfig: SmokeTestConfig = {
 

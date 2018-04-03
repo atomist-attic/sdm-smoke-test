@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-
-import { SmokeTestConfig } from "../config";
+import { logger } from "@atomist/automation-client";
 import axios, { AxiosError, AxiosPromise, AxiosResponse } from "axios";
 import { AxiosRequestConfig } from "axios";
-import { logger } from "@atomist/automation-client";
+import { SmokeTestConfig } from "../config";
 
 /**
  * Make a post to the SDM
