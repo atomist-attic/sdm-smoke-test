@@ -16,11 +16,13 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { allow, seconds } from "../AssertOptions";
+import { allow, AssertOptions, seconds } from "../AssertOptions";
 import { verifyGet } from "../util/endpoint";
-import { GitHubRemoteHelper, State, Status } from "./GitHubRemoteHelper";
+import { GitHubRemoteHelper, State, Status, statusString } from "./GitHubRemoteHelper";
 
 import * as assert from "power-assert";
+
+export const ApprovalSuffix = "atomist:approve=true";
 
 export async function verifyImmaterial(gitRemoteHelper: GitHubRemoteHelper,
                                        repo: { owner: string, repo: string, sha: string }): Promise<Status> {
@@ -79,25 +81,36 @@ export interface DeploymentStatuses {
 }
 
 export async function verifySdmDeploySuccess(gitRemoteHelper: GitHubRemoteHelper,
-                                             repo: { owner: string, repo: string, sha: string }): Promise<DeploymentStatuses> {
+                                             repo: { owner: string, repo: string, sha: string },
+                                             deployStatusTest: (s: Status) => boolean,
+                                             endpointStatusTest: (s: Status) => boolean,
+                                             askForApproval: boolean,
+                                             deployOptions?: AssertOptions): Promise<DeploymentStatuses> {
     const grr = new GitHubRepoRef(repo.owner, repo.repo, repo.sha);
     const deployStatus = await gitRemoteHelper.waitForStatusOf(
         grr,
-        s => s.context.includes("deploy"),
+        deployStatusTest,
         "success",
-        allow(seconds(80)).withRetries(15),
+        deployOptions || allow(seconds(80)).withRetries(15),
     );
     logger.info("Found deploy success status");
 
     const endpointStatus = await gitRemoteHelper.waitForStatusOf(
         grr,
-        s => s.context.includes("endpoint"),
+        endpointStatusTest,
         "success",
-        allow(seconds(5)).withRetries(5),
+        allow(seconds(30)).withRetries(5),
     );
     logger.info("Found endpoint success status");
 
     assert(!!endpointStatus.target_url, "Target URL should be set on endpoint");
+    if (askForApproval) {
+        assert(endpointStatus.target_url.endsWith(ApprovalSuffix),
+            `Endpoint status ${statusString(endpointStatus)} should seek approval`);
+    } else {
+        assert(!endpointStatus.target_url.includes("atomist:approve=true"),
+            `Endpoint status ${statusString(endpointStatus)} should not seek approval`);
+    }
     try {
         await verifyGet(endpointStatus.target_url);
         logger.info("Verified endpoint at " + endpointStatus.target_url);

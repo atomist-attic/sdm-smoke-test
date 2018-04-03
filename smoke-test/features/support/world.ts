@@ -22,6 +22,7 @@ import { EnvironmentSmokeTestConfig } from "../../../src/framework/EnvironmentSm
 import { logger } from "@atomist/automation-client";
 import { RepoId, RepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import * as assert from "power-assert";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 
 /**
  * World with basic setup and enabling focus repo to be set,
@@ -41,7 +42,7 @@ export class SmokeTestWorld {
      * Set the focus repo
      * @param {Repo} repo
      */
-    public setFocus(repo: RepoRef): RepoRef {
+    public setGitHubFocus(repo: GitHubRepoRef): RepoRef {
         this.focusRepo = repo;
         logger.info("Set focus project to %j", repo);
         return this.focusRepo;
@@ -60,7 +61,7 @@ export class SmokeTestWorld {
     public load(name: string): RepoRef {
         const focus = this[key(name)];
         assert(!!focus, `No repo saved as [${name}]`);
-        return this.setFocus(focus);
+        return this.setGitHubFocus(focus);
     }
 
     public registerCreated(rr: RepoId) {

@@ -15,7 +15,6 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { BranchCommit, commitToMaster } from "@atomist/automation-client/operations/edit/editModes";
 import { When } from "cucumber";
 import { edit } from "../../../src/framework/assertion/util/edit";
@@ -31,7 +30,7 @@ import * as assert from "power-assert";
  */
 
 When("README is changed on master", {timeout: 80 * 1000}, async function() {
-    const repo = GitHubRepoRef.from(this.focusRepo);
+    const repo = this.focusRepo;
 
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
     logger.info(`Invoking handler with [${customAffirmation}]...`);
@@ -49,7 +48,7 @@ When("README is changed on master", {timeout: 80 * 1000}, async function() {
 
 When("README is changed on a new branch", {timeout: 10 * 4000}, async function() {
     const branch = "test-" + new Date().getTime();
-    const repo = GitHubRepoRef.from(this.focusRepo);
+    const repo = this.focusRepo;
     this.focusRepo.branch = branch;
 
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
@@ -68,7 +67,7 @@ When("README is changed on a new branch", {timeout: 10 * 4000}, async function()
 });
 
 When("Java is changed on master", {timeout: 10 * 4000}, async function() {
-    const repo = GitHubRepoRef.from(this.focusRepo);
+    const repo = this.focusRepo;
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
     logger.info(`Invoking editor with [${customAffirmation}]...`);
 
@@ -89,7 +88,7 @@ When("Java is changed on a new branch", {timeout: 10 * 4000}, async function() {
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
     logger.info(`Invoking editor with [${customAffirmation}]...`);
     // Check out master
-    const repo = GitHubRepoRef.from(this.focusRepo);
+    const repo = this.focusRepo;
     this.focusRepo.branch = branch;
 
     await edit(this.config.credentials,

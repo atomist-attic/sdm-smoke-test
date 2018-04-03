@@ -15,6 +15,7 @@
  */
 
 import { Given, Then, When } from "cucumber";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
@@ -23,7 +24,7 @@ import { Given, Then, When } from "cucumber";
  */
 
 Given(/existing project (.*)/, function(project) {
-    this.setFocus( {owner: this.config.githubOrg, repo: project, sha: undefined});
+    this.setGitHubFocus( GitHubRepoRef.from({owner: this.config.githubOrg, repo: project, sha: undefined}));
 });
 
 // Save the current sha as name

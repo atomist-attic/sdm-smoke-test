@@ -47,7 +47,7 @@ export async function doWithOptions<T>(what: () => Promise<T>,
     }
     return !!opts && !!opts.allowMillis ?
         Promise.race([
-            blowUpInMillis("Get commit", opts.allowMillis),
+            blowUpInMillis(description, opts.allowMillis),
             withRetryIfNeeded(),
         ]) :
         withRetryIfNeeded();

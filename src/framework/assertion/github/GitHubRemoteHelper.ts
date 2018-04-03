@@ -17,7 +17,7 @@
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef, isGitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RemoteRepoRef, RepoId } from "@atomist/automation-client/operations/common/RepoId";
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
 import { RepoBranchTips } from "../../../typings/types";
 import { Dated, GitRemoteHelper } from "../GitRemoteHelper";
 
@@ -34,6 +34,7 @@ import Commit = RepoBranchTips.Commit;
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { AssertOptions } from "../AssertOptions";
 import { doWithOptions, FatalError } from "../util/retry";
+import { doWithRetry } from "@atomist/automation-client/util/retry";
 
 export type State = "error" | "failure" | "pending" | "success";
 
@@ -75,7 +76,18 @@ export class GitHubRemoteHelper implements GitRemoteHelper {
         if (!it) {
             throw new Error(`Status satisfying [${test}] required on commit ${id.sha}: Found ` + statusesString(statuses));
         }
+        logger.info("Found matching status: %s for %s", statusString(it), test.toString());
         return it;
+    }
+
+    public updateStatus(rr: GitHubRepoRef, inputStatus: Status): AxiosPromise {
+        const saferStatus = inputStatus; // ensureValidUrl(inputStatus);
+        const url = `${rr.apiBase}/repos/${rr.owner}/${rr.repo}/statuses/${rr.sha}`;
+        logger.info("Updating github status: %s to %j", url, saferStatus);
+        return doWithRetry(() => axios.post(url, saferStatus, this.authHeaders)
+            .catch(err =>
+                Promise.reject(new Error(`Error hitting ${url} to set status ${JSON.stringify(saferStatus)}: ${err.message}`)),
+            ), `Updating github status: ${url} to ${JSON.stringify(saferStatus)}`, {});
     }
 
     public async waitForStatusOf(id: RemoteRepoRef,
@@ -191,6 +203,6 @@ function statusesString(statuses: Status[]) {
         .map(statusString).join("\n\t")}`;
 }
 
-function statusString(s: Status) {
+export function statusString(s: Status) {
     return `context='${s.context}';state='${s.state}';target_url=${s.target_url};description='${s.description}'`;
 }

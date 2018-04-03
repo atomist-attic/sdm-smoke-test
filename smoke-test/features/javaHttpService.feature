@@ -19,6 +19,8 @@ Feature: Java HTTP service support
     Then reviews should succeed
     Then reactions should succeed
     Then it should deploy to staging
+    Then approve gate endpoint
+    Then it should deploy to production
 
   Scenario: Java change on new branch
     Given existing project losgatos1
