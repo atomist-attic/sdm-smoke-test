@@ -76,6 +76,8 @@ export class SmokeTestWorld {
 
     // TODO also clean up created branches
     public async cleanup() {
+        this.focusRepo = undefined;
+
         logger.info("%d repos to clean up", this.reposCreated.length);
         return Promise.all(
             this.reposCreated.map(async id => {

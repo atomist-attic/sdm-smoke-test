@@ -23,8 +23,6 @@ Feature: Java HTTP service support
   Scenario: Java change on new branch
     Given project losgatos1
     When Java is changed on a new branch
-    Then build should succeed
-    Then reviews should succeed
     Then reactions should succeed
     Then it should deploy locally
 
@@ -35,12 +33,8 @@ Feature: Java HTTP service support
     When Java is changed on a new branch
     When save as b2
     Then load b1
-    Then build should succeed
-    Then reviews should succeed
     Then reactions should succeed
     Then it should deploy locally
     Then load b2
-    Then build should succeed
-    Then reviews should succeed
     Then reactions should succeed
     Then it should deploy locally

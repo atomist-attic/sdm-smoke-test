@@ -49,8 +49,8 @@ When("README is changed on master", {timeout: 10 * 4000}, async function() {
 
 When("README is changed on a new branch", {timeout: 10 * 4000}, async function() {
     const branch = "test-" + new Date().getTime();
-    this.focusRepo.branch = branch;
     const repo = GitHubRepoRef.from(this.focusRepo);
+    this.focusRepo.branch = branch;
 
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
     logger.info(`Invoking handler with [${customAffirmation}]...`);
@@ -59,6 +59,8 @@ When("README is changed on a new branch", {timeout: 10 * 4000}, async function()
         editorOneInvocation("affirmation", repo,
             {customAffirmation, branch}));
     logger.info("Handler returned. Waiting for GitHub...");
+    repo.branch = branch;
+    repo.sha = branch;
 
     const currentProject = await this.gitRemoteHelper.clone(repo, {retries: 5});
     const gitStatus = await currentProject.gitStatus();
@@ -86,6 +88,7 @@ When("Java is changed on a new branch", {timeout: 10 * 4000}, async function() {
     const branch = "test-" + new Date().getTime();
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
     logger.info(`Invoking editor with [${customAffirmation}]...`);
+    // Check out master
     const repo = GitHubRepoRef.from(this.focusRepo);
     this.focusRepo.branch = branch;
 
@@ -95,8 +98,11 @@ When("Java is changed on a new branch", {timeout: 10 * 4000}, async function() {
         async p => p.addFile(
             "src/main/java/Thing.java",
             `${ApacheHeader}\n// ${customAffirmation}\npublic class Thing {}`));
+    repo.branch = branch;
+    repo.sha = branch;
 
     const currentProject = await this.gitRemoteHelper.clone(repo, {retries: 5});
     const gitStatus = await currentProject.gitStatus();
     this.focusRepo.sha = gitStatus.sha;
+    console.log("THE FOCUS REPO IS " + JSON.stringify(this.focusRepo) + ";repo=" + JSON.stringify(repo));
 });

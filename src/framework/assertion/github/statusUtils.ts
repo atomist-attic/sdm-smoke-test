@@ -98,7 +98,11 @@ export async function verifySdmDeploySuccess(gitRemoteHelper: GitHubRemoteHelper
     logger.info("Found endpoint success status");
 
     assert(!!endpointStatus.target_url, "Target URL should be set on endpoint");
-    const resp = await verifyGet(endpointStatus.target_url);
-    logger.info("Verified endpoint at " + endpointStatus.target_url);
-    return {deployStatus, endpointStatus};
+    try {
+        await verifyGet(endpointStatus.target_url);
+        logger.info("Verified endpoint at " + endpointStatus.target_url);
+        return {deployStatus, endpointStatus};
+    } catch (err) {
+        throw new Error(`Failed to verify reported deployment of ${JSON.stringify(repo)} at ${endpointStatus.target_url}: ${err.messageClient}`);
+    }
 }
