@@ -32,7 +32,7 @@ Then("project should exist", {timeout: 30 * 1000}, async function() {
         new GitHubRepoRef(this.focusRepo.owner, this.focusRepo.repo), {retries: 2});
 });
 
-When(/project (.*) does not exist/, {timeout: 30 * 1000}, async function(name) {
+When(/github\.com project (.*) does not exist/, {timeout: 30 * 1000}, async function(name) {
     logger.info("Checking that project %s does not exist", this.focusRepo);
     try {
         await this.gitRemoteHelper.clone(
