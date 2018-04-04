@@ -32,9 +32,9 @@ import {
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import Commit = RepoBranchTips.Commit;
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
+import { doWithRetry } from "@atomist/automation-client/util/retry";
 import { AssertOptions } from "../AssertOptions";
 import { doWithOptions, FatalError } from "../util/retry";
-import { doWithRetry } from "@atomist/automation-client/util/retry";
 
 export type State = "error" | "failure" | "pending" | "success";
 

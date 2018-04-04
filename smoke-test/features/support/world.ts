@@ -20,9 +20,9 @@ import { SmokeTestConfig } from "../../../src/framework/config";
 import { EnvironmentSmokeTestConfig } from "../../../src/framework/EnvironmentSmokeTestConfig";
 
 import { logger } from "@atomist/automation-client";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RepoId, RepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import * as assert from "power-assert";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 
 /**
  * World with basic setup and enabling focus repo to be set,
