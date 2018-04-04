@@ -83,7 +83,7 @@ When("Java is changed on master", {timeout: 10 * 4000}, async function() {
     this.focusRepo.sha = gitStatus.sha;
 });
 
-When("Java is changed on a new branch", {timeout: 10 * 4000}, async function() {
+When("Java is changed on a new branch", {timeout: 100 * 1000}, async function() {
     const branch = "test-" + new Date().getTime();
     const customAffirmation = `Squirrel number ${new Date().getTime()} gnawed industriously`;
     logger.info(`Invoking editor with [${customAffirmation}]...`);
