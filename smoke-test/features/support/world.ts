@@ -21,8 +21,11 @@ import { EnvironmentSmokeTestConfig } from "../../../src/framework/EnvironmentSm
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { RepoId, RepoRef } from "@atomist/automation-client/operations/common/RepoId";
+import { RemoteRepoRef, RepoId } from "@atomist/automation-client/operations/common/RepoId";
 import * as assert from "power-assert";
+import { ApolloGraphClient } from "@atomist/automation-client/graph/ApolloGraphClient";
+import { TokenCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
+import { GraphClient } from "@atomist/automation-client/spi/graph/GraphClient";
 
 /**
  * World with basic setup and enabling focus repo to be set,
@@ -30,7 +33,14 @@ import * as assert from "power-assert";
  */
 export class SmokeTestWorld {
 
-    public focusRepo: RepoRef;
+    private mFocusRepo: RemoteRepoRef;
+
+    get focusRepo(): RemoteRepoRef {
+        return this.mFocusRepo;
+    }
+    set focusRepo(fr: RemoteRepoRef) {
+        this.mFocusRepo = fr;
+    }
 
     public readonly config: SmokeTestConfig = EnvironmentSmokeTestConfig;
 
@@ -38,11 +48,16 @@ export class SmokeTestWorld {
 
     private readonly reposCreated: RepoId[] = [];
 
+    public get graphClient(): GraphClient {
+        return new ApolloGraphClient(`https://automation.atomist.com/graphql/team/${this.config.atomistTeamId}`,
+            { Authorization: `token ${(this.config.credentials as TokenCredentials).token}` });
+    }
+
     /**
      * Set the focus repo
      * @param {Repo} repo
      */
-    public setGitHubFocus(repo: GitHubRepoRef): RepoRef {
+    public setGitHubFocus(repo: GitHubRepoRef): RemoteRepoRef {
         this.focusRepo = repo;
         logger.info("Set focus project to %j", repo);
         return this.focusRepo;
@@ -58,13 +73,13 @@ export class SmokeTestWorld {
         logger.info("Saved focus repo %j as %s", this.focusRepo, name);
     }
 
-    public load(name: string): RepoRef {
+    public load(name: string): RemoteRepoRef {
         const focus = this[key(name)];
         assert(!!focus, `No repo saved as [${name}]`);
         return this.setGitHubFocus(focus);
     }
 
-    public registerCreated(rr: RepoId) {
+    public registerCreated(rr: RemoteRepoRef) {
         this.reposCreated.push(rr);
         this.focusRepo = rr;
     }

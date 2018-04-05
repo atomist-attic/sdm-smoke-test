@@ -1,0 +1,12 @@
+query AllPushes($org: String!, $repo: String!) {
+    Push {
+        branch
+        commits {
+            sha
+            message
+        }
+        repo(owner: $org, name: $repo) @required {
+            name
+        }
+    }
+}

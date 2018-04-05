@@ -17,8 +17,8 @@
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef, isGitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { RemoteRepoRef, RepoId } from "@atomist/automation-client/operations/common/RepoId";
-import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
-import { RepoBranchTips } from "../../../typings/types";
+import axios, { AxiosPromise, AxiosRequestConfig, AxiosResponse } from "axios";
+import { AllPullRequests, RepoBranchTips } from "../../../typings/types";
 import { Dated, GitRemoteHelper } from "../GitRemoteHelper";
 
 import * as assert from "power-assert";
@@ -35,6 +35,8 @@ import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { doWithRetry } from "@atomist/automation-client/util/retry";
 import { AssertOptions } from "../AssertOptions";
 import { doWithOptions, FatalError } from "../util/retry";
+import PullRequest = AllPullRequests.PullRequest;
+import { GitShaRegExp } from "@atomist/automation-client/operations/common/params/gitHubPatterns";
 
 export type State = "error" | "failure" | "pending" | "success";
 
@@ -80,9 +82,15 @@ export class GitHubRemoteHelper implements GitRemoteHelper {
         return it;
     }
 
-    public updateStatus(rr: GitHubRepoRef, inputStatus: Status): AxiosPromise {
+    public async updateStatus(rr: GitHubRepoRef, inputStatus: Status): Promise<AxiosResponse> {
+        let sha = rr.sha;
+        if (!rr.sha || !rr.sha.match(GitShaRegExp.pattern)) {
+            // Clone to get sha
+            const cloned = await this.clone(rr);
+            sha = (await cloned.gitStatus()).sha;
+        }
         const saferStatus = inputStatus; // ensureValidUrl(inputStatus);
-        const url = `${rr.apiBase}/repos/${rr.owner}/${rr.repo}/statuses/${rr.sha}`;
+        const url = `${rr.apiBase}/repos/${rr.owner}/${rr.repo}/statuses/${sha}`;
         logger.info("Updating github status: %s to %j", url, saferStatus);
         return doWithRetry(() => axios.post(url, saferStatus, this.authHeaders)
             .catch(err =>
@@ -158,6 +166,19 @@ export class GitHubRemoteHelper implements GitRemoteHelper {
             logger.warn("Error deleting repo %j: %s", id, err.message);
             return false;
         }
+    }
+
+    public async mergePullRequest(grr: GitHubRepoRef, pr: PullRequest): Promise<boolean> {
+        const url = `${grr.apiBase}/repos/${grr.owner}/${grr.repo}/pulls/${pr.number}/merge`;
+        const data = {
+            commit_title: `Merge PR [${pr.number}]`,
+            commit_message:  `Merge PR [${pr.number}]`,
+            sha: pr.head.sha,
+            merge_method: "merge",
+        };
+        logger.info("Calling [%s] to merge PR number %d via %j on %j", url, pr.number, data, grr);
+        await axios.put(url, data, this.authHeaders);
+        return true;
     }
 
     public async waitForTopic(rr: RemoteRepoRef, topic: string, opts?: AssertOptions): Promise<boolean> {

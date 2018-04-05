@@ -16,19 +16,30 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { Then, When } from "cucumber";
+import { When } from "cucumber";
 import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
+import { SmokeTestWorld } from "../support/world";
 
-When(/we create a new Spring Boot Project named (.*)/, {timeout: 45 * 1000}, async function(repo) {
-    const grr = GitHubRepoRef.from({owner: this.config.githubOrg, repo});
+When(/we create a new Spring Boot Project named (.*)/, {timeout: 45 * 1000}, async function (repo) {
+    await createRepo(this as SmokeTestWorld, repo);
+});
+
+When("we create a new Spring Boot Project", {timeout: 45 * 1000}, async function () {
+    const repo = "spring-boot-" + new Date().getTime();
+    await createRepo(this as SmokeTestWorld, repo);
+});
+
+async function createRepo(world: SmokeTestWorld, repo: string) {
+    world.focusRepo = GitHubRepoRef.from({owner: world.config.githubOrg, repo});
     logger.info("Creating project named %s...", repo);
-    this.registerCreated(grr);
-    await invokeCommandHandler(this.config,
+    world.registerCreated(world.focusRepo);
+    await invokeCommandHandler(world.config,
         {
             name: "springBootGenerator",
             parameters: {
                 "target.repo": repo,
-                "rootPackage": "com.atomist"},
+                "rootPackage": "com.atomist",
+            },
         });
     logger.info("Handler returned. Waiting for GitHub...");
-});
+}

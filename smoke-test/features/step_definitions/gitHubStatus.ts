@@ -35,11 +35,11 @@ import {
  * Definitions to verify GitHub statuses that should have been set by SDM under test
  */
 
-Then("build should succeed", {timeout: 60 * 1000}, async function() {
+Then("build should succeed", {timeout: 240 * 1000}, async function() {
     await verifySdmBuildState(this.gitRemoteHelper, this.focusRepo, "success");
 });
 
-Then("build should fail", {timeout: 60 * 1000}, async function() {
+Then("build should fail", {timeout: 240 * 1000}, async function() {
     await verifySdmBuildState(this.gitRemoteHelper, this.focusRepo, "failure");
 });
 
@@ -86,7 +86,7 @@ Then("it should be immaterial", {timeout: 20 * 1000}, async function() {
 });
 
 // Perform approval of endpoint, resetting context
-Then(/approve gate (.*)/, {timeout: 20 * 1000}, async function(name) {
+Then(/approve gate (.*)/, {timeout: 40 * 1000}, async function(name) {
     logger.info("About to set approval gate on %j", this.focusRepo);
     const forApprovalStatus = await this.gitRemoteHelper.requiredStatus(this.focusRepo,
         s => !!s && s.context.toLowerCase().includes(name.toLowerCase()) && !!s.target_url && s.target_url.includes(ApprovalSuffix));
@@ -95,7 +95,7 @@ Then(/approve gate (.*)/, {timeout: 20 * 1000}, async function(name) {
         state: forApprovalStatus.state,
         context: forApprovalStatus.context,
         description: forApprovalStatus.description,
-        target_url: forApprovalStatus.target_url.replace(ApprovalSuffix, ""),
+        target_url: forApprovalStatus.target_url.replace(ApprovalSuffix, "").replace("?", ""),
     };
     await this.gitRemoteHelper.updateStatus(this.focusRepo, approvedStatus);
 });

@@ -18,7 +18,7 @@ import { logger } from "@atomist/automation-client";
 import { BranchCommit, commitToMaster } from "@atomist/automation-client/operations/edit/editModes";
 import { When } from "cucumber";
 import { edit } from "../../../src/framework/assertion/util/edit";
-import { editorOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
+import { editOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { ApacheHeader } from "../support/headers";
 
 import * as assert from "power-assert";
@@ -36,7 +36,7 @@ When("README is changed on master", {timeout: 80 * 1000}, async function() {
     logger.info(`Invoking handler with [${customAffirmation}]...`);
 
     await invokeCommandHandler(this.config,
-        editorOneInvocation("affirmation", repo,
+        editOneInvocation("affirmation", repo,
             {customAffirmation}));
     logger.info("Handler returned. Waiting for GitHub...");
 
@@ -55,7 +55,7 @@ When("README is changed on a new branch", {timeout: 10 * 4000}, async function()
     logger.info(`Invoking handler with [${customAffirmation}]...`);
 
     await invokeCommandHandler(this.config,
-        editorOneInvocation("affirmation", repo,
+        editOneInvocation("affirmation", repo,
             {customAffirmation, branch}));
     logger.info("Handler returned. Waiting for GitHub...");
     repo.branch = branch;

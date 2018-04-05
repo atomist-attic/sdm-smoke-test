@@ -35,7 +35,7 @@ export interface Params {
 export interface CommandHandlerInvocation {
     name: string;
     parameters: Params;
-    mappedParameters?: Arg[];
+    mappedParameters?: Params;
     secrets?: Secret[];
 }
 
@@ -47,7 +47,7 @@ export async function invokeCommandHandler(config: SmokeTestConfig,
     const data = {
         command: invocation.name,
         parameters: propertiesToArgs(invocation.parameters),
-        mapped_parameters: (invocation.mappedParameters || []).concat([
+        mapped_parameters: propertiesToArgs(invocation.mappedParameters || {}).concat([
             {name: "slackTeam", value: config.atomistTeamId},
             // TODO fix this
             {name: "target.webhookUrl", value: "foo"},
@@ -71,16 +71,17 @@ export async function invokeCommandHandler(config: SmokeTestConfig,
     return resp.data;
 }
 
-export function editorOneInvocation(editorCommandName: string,
-                                    rr: RemoteRepoRef,
-                                    parameters: Params): CommandHandlerInvocation {
+export function editOneInvocation(editorCommandName: string,
+                                  rr: RemoteRepoRef,
+                                  parameters: Params): CommandHandlerInvocation {
     return {
         name: editorCommandName,
         parameters,
-        mappedParameters: [
-            {name: "targets.owner", value: rr.owner},
-            {name: "targets.repo", value: rr.repo},
-        ],
+        mappedParameters:
+            {
+                "targets.owner": rr.owner,
+                "targets.repo": rr.repo,
+            },
         secrets: [],
     };
 }

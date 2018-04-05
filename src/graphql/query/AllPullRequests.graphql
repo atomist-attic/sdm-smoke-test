@@ -1,0 +1,15 @@
+
+query AllPullRequests($org: String!, $repo: String!) {
+    PullRequest {
+        title
+        body
+        number
+        head {
+            sha
+            message
+        }
+        repo(owner: $org, name: $repo) @required {
+            name
+        }
+    }
+}
