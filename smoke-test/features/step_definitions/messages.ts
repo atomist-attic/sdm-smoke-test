@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
 import { Then } from "cucumber";
 import { sdmGet } from "../../../src/framework/invocation/httpInvoker";
+import * as assert from "power-assert";
 
-Then(/last message should include .*/, async function() {
+Then(/last text message is (.*)/, async function(message: string) {
+    message = message.split("\\n").join("\n")
     const messages = await sdmGet(this.config, "log/messages");
-    logger.info(messages.data);
+    const lastMesssage = messages.data[0];
+    assert.equal(typeof lastMesssage.value,"string", "Last message is not a text message");
+    assert.equal(lastMesssage.value, message, `Last message does not include '${message}'`);
 });
