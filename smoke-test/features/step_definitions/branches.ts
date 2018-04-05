@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+import { logger } from "@atomist/automation-client";
 import { Then } from "cucumber";
 import * as assert from "power-assert";
 import { AllPullRequests, AllPushes } from "../../../src/typings/types";
-import { logger } from "@atomist/automation-client";
 
-Then(/focus on branch with name containing (.*)/, {timeout: 80 * 1000}, async function (branchContent: string) {
+Then(/focus on branch with name containing (.*)/, {timeout: 80 * 1000}, async function(branchContent: string) {
     const result: AllPushes.Query = await this.world.graphClient.executeQueryFromFile("src/graphql/query/AllPushes", {
         org: this.focusRepo.owner,
         repo: this.focusRepo.repo,
@@ -30,7 +30,7 @@ Then(/focus on branch with name containing (.*)/, {timeout: 80 * 1000}, async fu
     this.focusRepo.branch = pushWeWant.branch;
 });
 
-Then(/merge pull request with title containing '(.*)'/, {timeout: 80 * 1000}, async function (titleContent: string) {
+Then(/merge pull request with title containing '(.*)'/, {timeout: 80 * 1000}, async function(titleContent: string) {
     const result: AllPullRequests.Query = await this.graphClient.executeQueryFromFile("src/graphql/query/AllPullRequests", {
         org: this.focusRepo.owner,
         repo: this.focusRepo.repo,

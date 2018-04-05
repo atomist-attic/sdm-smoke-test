@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-import { Then, When } from "cucumber";
 import { logger } from "@atomist/automation-client";
-import { editOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
+import { Then, When } from "cucumber";
 import * as assert from "power-assert";
+import { editOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { SmokeTestWorld } from "../support/world";
 
-When(/run editor (.*) with no parameters/, {timeout: 80 * 1000}, async function (name: string) {
+When(/run editor (.*) with no parameters/, {timeout: 80 * 1000}, async function(name: string) {
     await doEdit(this as SmokeTestWorld, name, {}, false);
 });
 
-When(/run editor (.*) with no parameters and change focus/, {timeout: 80 * 1000}, async function (name: string) {
+When(/run editor (.*) with no parameters and change focus/, {timeout: 80 * 1000}, async function(name: string) {
     await doEdit(this as SmokeTestWorld, name, {}, true);
 });
 
-When(/run editor (.*) given parameters/, {timeout: 80 * 1000}, async function (name: string, params) {
+When(/run editor (.*) given parameters/, {timeout: 80 * 1000}, async function(name: string, params) {
     throw new Error("Implement with a data table: https://cucumber.io/docs/reference");
 });
 
-Then("enable deploy", {timeout: 80 * 1000}, async function () {
+Then("enable deploy", {timeout: 80 * 1000}, async function() {
     logger.info(`Invoking enable deploy...`);
     await invokeCommandHandler(this.config, {
         name: "EnableDeploy",
@@ -61,4 +61,3 @@ async function doEdit(world: SmokeTestWorld, name: string, params: any, changeFo
         world.focusRepo.branch = gitStatus.branch;
     }
 }
-

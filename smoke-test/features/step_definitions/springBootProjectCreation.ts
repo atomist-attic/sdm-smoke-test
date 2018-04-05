@@ -20,11 +20,11 @@ import { When } from "cucumber";
 import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { SmokeTestWorld } from "../support/world";
 
-When(/we create a new Spring Boot Project named (.*)/, {timeout: 45 * 1000}, async function (repo) {
+When(/we create a new Spring Boot Project named (.*)/, {timeout: 45 * 1000}, async function(repo) {
     await createRepo(this as SmokeTestWorld, repo);
 });
 
-When("we create a new Spring Boot Project", {timeout: 45 * 1000}, async function () {
+When("we create a new Spring Boot Project", {timeout: 45 * 1000}, async function() {
     const repo = "spring-boot-" + new Date().getTime();
     await createRepo(this as SmokeTestWorld, repo);
 });

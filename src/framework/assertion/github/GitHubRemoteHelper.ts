@@ -25,6 +25,8 @@ import * as assert from "power-assert";
 
 import * as _ from "lodash";
 
+import PullRequest = AllPullRequests.PullRequest;
+import { GitShaRegExp } from "@atomist/automation-client/operations/common/params/gitHubPatterns";
 import {
     ProjectOperationCredentials,
     TokenCredentials,
@@ -35,8 +37,6 @@ import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { doWithRetry } from "@atomist/automation-client/util/retry";
 import { AssertOptions } from "../AssertOptions";
 import { doWithOptions, FatalError } from "../util/retry";
-import PullRequest = AllPullRequests.PullRequest;
-import { GitShaRegExp } from "@atomist/automation-client/operations/common/params/gitHubPatterns";
 
 export type State = "error" | "failure" | "pending" | "success";
 
