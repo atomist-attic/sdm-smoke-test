@@ -1,3 +1,5 @@
+
+@java @spring @build @dry-run
 Feature: Try to upgrade Spring Boot version
   Try to upgrade Spring Boot version
 

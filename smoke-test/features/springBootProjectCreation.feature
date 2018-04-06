@@ -1,7 +1,18 @@
 
+@java @spring
 Feature: Spring Boot project creation
   SDM should create, build and deploy Spring Boot projects
 
+  Scenario: Create a new Spring Boot project and deploy locally
+    When we create a new Spring Boot Project
+    Then project should exist
+    And project should have spring topic
+    And project should have spring-boot topic
+    And project should have java topic
+    And reactions should succeed
+    And it should deploy locally
+
+    @staging @production
   Scenario: Create a new Spring Boot project and deploy to staging and production
     When we create a new Spring Boot Project
     Then project should exist

@@ -78,7 +78,7 @@
     "lint:gql": "prettier --list-different \"src/graphql/**/*.graphql\"",
     "lint:fix": "npm-run-all lint:ts:fix fmt:gql",
     "lint:ts:fix": "npm run lint:ts -- --fix",
-    "test:cucumber": "cucumber-js --require 'build/smoke-test/**/*.js' \"smoke-test/features/**/*.feature\"",
+    "test:cucumber": "cucumber-js --require 'build/smoke-test/**/*.js' \"smoke-test/features/**/*.feature\" \"--tags ${TAGS}\"",
     "test:cucumber:one": "cucumber-js --require 'build/smoke-test/**/*.js' \"smoke-test/features/**/${TEST}.feature\"",
     "smoke-test": "npm-run-all clean:js compile:ts test:cucumber",
     "smoke-test:one": "npm-run-all clean:js compile:ts test:cucumber:one",

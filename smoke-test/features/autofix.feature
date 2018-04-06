@@ -1,4 +1,5 @@
-
+@build
+@autofix
 Feature: Autofix support
   Autofixes should work
 

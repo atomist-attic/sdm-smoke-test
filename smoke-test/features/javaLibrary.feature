@@ -1,4 +1,5 @@
 
+@java @build
 Feature: Java library support
   Java libraries should compile
 
