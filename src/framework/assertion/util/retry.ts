@@ -71,7 +71,7 @@ function doWithRetry<R>(what: () => Promise<R>, description: string,
     return promiseRetry(retryOptions, retry => {
         return what()
             .catch(err => {
-                logger.warn(`Error occurred attempting '${description}'. '${err.message}'`);
+                logger.debug(`Error occurred attempting '${description}'. '${err.message}'`);
                 if (isFatal(err)) {
                     throw err;
                 }
