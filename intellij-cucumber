@@ -1,0 +1,9 @@
+projectRoot=/Users/jessitron/code/atomist/sdm-smoke-test
+
+echo "YOYOUYOYO"
+
+source $projectRoot/.be
+
+echo args: "$@"
+$projectRoot/node_modules/cucumber/bin/cucumber-js "$@"
+
