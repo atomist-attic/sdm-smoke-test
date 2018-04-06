@@ -16,10 +16,10 @@
 
 import { Then } from "cucumber";
 import * as assert from "power-assert";
-import { sdmGet } from "../../../src/framework/invocation/httpInvoker";
 import { doWithOptions } from "../../../src/framework/assertion/util/retry";
+import { sdmGet } from "../../../src/framework/invocation/httpInvoker";
 
-Then(/last text message is (.*)/, {timeout: 30 * 1000}, async function (messageToLookFor: string) {
+Then(/last text message is (.*)/, {timeout: 30 * 1000}, async function(messageToLookFor: string) {
     const message = messageToLookFor.split("\\n").join("\n");
     const messages = await sdmGet(this.config, "log/messages");
     const lastMessage = messages.data[0];
@@ -27,7 +27,7 @@ Then(/last text message is (.*)/, {timeout: 30 * 1000}, async function (messageT
     assert.equal(lastMessage.value, message, `Last message does not include '${message}'`);
 });
 
-Then(/recent text message was (.*)/, {timeout: 30 * 1000}, async function (messageToLookFor: string) {
+Then(/recent text message was (.*)/, {timeout: 30 * 1000}, async function(messageToLookFor: string) {
     const message = messageToLookFor.split("\\n").join("\n");
     await doWithOptions(async () => {
         const messages = await sdmGet(this.config, "log/messages");
