@@ -17,11 +17,22 @@
 import { Then } from "cucumber";
 import * as assert from "power-assert";
 import { sdmGet } from "../../../src/framework/invocation/httpInvoker";
+import { doWithOptions } from "../../../src/framework/assertion/util/retry";
 
-Then(/last text message is (.*)/, async function(messageToLookFor: string) {
+Then(/last text message is (.*)/, {timeout: 30 * 1000}, async function (messageToLookFor: string) {
     const message = messageToLookFor.split("\\n").join("\n");
     const messages = await sdmGet(this.config, "log/messages");
-    const lastMesssage = messages.data[0];
-    assert.equal(typeof lastMesssage.value, "string", "Last message is not a text message");
-    assert.equal(lastMesssage.value, message, `Last message does not include '${message}'`);
+    const lastMessage = messages.data[0];
+    assert.equal(typeof lastMessage.value, "string", "Last message is not a text message");
+    assert.equal(lastMessage.value, message, `Last message does not include '${message}'`);
+});
+
+Then(/recent text message was (.*)/, {timeout: 30 * 1000}, async function (messageToLookFor: string) {
+    const message = messageToLookFor.split("\\n").join("\n");
+    await doWithOptions(async () => {
+        const messages = await sdmGet(this.config, "log/messages");
+        assert(messages.data
+                .some(m => typeof m.value === "string" && m.value === message),
+            `Looked in ${messages.data.length} messages, none included '${message}'`);
+    }, "find message", { retries: 20, delayForMillis: 1000});
 });
