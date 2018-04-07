@@ -87,6 +87,7 @@ Then("it should be immaterial", {timeout: 20 * 1000}, async function() {
 
 // Perform approval of endpoint, resetting context
 Then(/approve gate (.*)/, {timeout: 40 * 1000}, async function(name) {
+    // really should be pushing the button on the card.
     logger.info("About to set approval gate on %j", this.focusRepo);
     const forApprovalStatus = await this.gitRemoteHelper.requiredStatus(this.focusRepo,
         s => !!s && s.context.toLowerCase().includes(name.toLowerCase()) && !!s.target_url && s.target_url.includes(ApprovalSuffix));
@@ -94,7 +95,7 @@ Then(/approve gate (.*)/, {timeout: 40 * 1000}, async function(name) {
     const approvedStatus: Status = {
         state: forApprovalStatus.state,
         context: forApprovalStatus.context,
-        description: forApprovalStatus.description,
+        description: forApprovalStatus.description + " | approved by smoke tests",
         target_url: forApprovalStatus.target_url.replace(ApprovalSuffix, "").replace("?", ""),
     };
     await this.gitRemoteHelper.updateStatus(this.focusRepo, approvedStatus);

@@ -18,6 +18,7 @@ import { logger } from "@atomist/automation-client";
 import { Then } from "cucumber";
 import * as assert from "power-assert";
 import { AllPullRequests, AllPushes } from "../../../src/typings/types";
+import { waitSeconds } from "../../../src/framework/assertion/util/wait";
 
 Then(/focus on branch with name containing (.*)/, {timeout: 80 * 1000}, async function(branchContent: string) {
     const result: AllPushes.Query = await this.world.graphClient.executeQueryFromFile("src/graphql/query/AllPushes", {
@@ -35,6 +36,8 @@ Then(/merge pull request with title containing '(.*)'/, {timeout: 80 * 1000}, as
         org: this.focusRepo.owner,
         repo: this.focusRepo.repo,
     });
+    // TODO this is nasty but may avoid a race condition
+    await waitSeconds(10);
     const prWeWant = result.PullRequest.find(p => p.title.includes(titleContent));
     logger.info("Found PR %d (%s) on %j", prWeWant.number, prWeWant.title, this.focusRepo);
     assert(!!prWeWant, `Must have one PR with title containing '${titleContent}'`);

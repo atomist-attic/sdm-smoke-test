@@ -76,7 +76,7 @@ export class GitHubRemoteHelper implements GitRemoteHelper {
         const statuses = await this.statuses(id, opts);
         const it = statuses.find(test);
         if (!it) {
-            throw new Error(`Status satisfying [${test}] required on commit ${id.sha}: Found ` + statusesString(statuses));
+            throw new Error(`Status satisfying [${test}] required on commit ${id.repo}#${id.sha}: Found ` + statusesString(statuses));
         }
         logger.info("Found matching status: %s for %s", statusString(it), test.toString());
         return it;
@@ -116,7 +116,7 @@ export class GitHubRemoteHelper implements GitRemoteHelper {
                     throw new Error(`Keeping looking: Status satisfying [${test}] required on commit ${id.sha}: Found ` + statusesString(statuses));
                 }
                 return it;
-            }, `Waiting for status satisfying [${test}] and state [${state}] on commit ${id.sha}`,
+            }, `Waiting for status satisfying [${test}] and state [${state}] on commit ${id.repo}/${id.sha}`,
             opts);
     }
 
