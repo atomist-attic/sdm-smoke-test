@@ -17,8 +17,8 @@
 import { logger } from "@atomist/automation-client";
 import { Then } from "cucumber";
 import * as assert from "power-assert";
-import { AllPullRequests, AllPushes } from "../../../src/typings/types";
 import { waitSeconds } from "../../../src/framework/assertion/util/wait";
+import { AllPullRequests, AllPushes } from "../../../src/typings/types";
 
 Then(/focus on branch with name containing (.*)/, {timeout: 80 * 1000}, async function(branchContent: string) {
     const result: AllPushes.Query = await this.world.graphClient.executeQueryFromFile("src/graphql/query/AllPushes", {
