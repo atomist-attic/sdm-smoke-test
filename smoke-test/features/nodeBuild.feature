@@ -16,6 +16,6 @@ Feature: Node build support
     And project should have node topic
     And reviews should succeed
     And build should succeed
-    Then run editor breakBuildNode with no parameters
+    Then run editor breakNodeBuild with no parameters
     Then reviews should succeed
     And build should fail

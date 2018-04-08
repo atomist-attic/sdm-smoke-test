@@ -16,6 +16,6 @@ Feature: Java build breakage support
     And project should have java topic
     And reviews should succeed
     And build should succeed
-    Then run editor breakBuildJava with no parameters
+    Then run editor breakJavaBuild with no parameters
     Then reviews should succeed
     And build should fail
