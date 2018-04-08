@@ -20,11 +20,10 @@ import { When } from "cucumber";
 import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { SmokeTestWorld } from "../support/world";
 
-When("we create a new Node project", {timeout: 45 * 1000}, async function () {
+When("we create a new Node project", {timeout: 45 * 1000}, async function() {
     const repo = "node-" + new Date().getTime();
     await createRepo(this as SmokeTestWorld, repo);
 });
-
 
 async function createRepo(world: SmokeTestWorld, repo: string) {
     world.focusRepo = GitHubRepoRef.from({owner: world.config.githubOrg, repo});
