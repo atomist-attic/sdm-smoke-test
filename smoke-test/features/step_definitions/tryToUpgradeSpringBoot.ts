@@ -15,9 +15,8 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { Given, Then, When } from "cucumber";
-import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
+import { When } from "cucumber";
+import { editOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
@@ -25,20 +24,14 @@ import { invokeCommandHandler } from "../../../src/framework/invocation/CommandH
  * Definitions to handle Spring Boot version upgrade
  */
 
-// Save the current sha as name
-// When(/try to upgrade Spring Boot to (.*)/, async function(version) {
-//     const grr = GitHubRepoRef.from(this.focusRepo);
-//     logger.info("Upgrading Spring boot to %s on %s...", version, this.focusRepo.repo);
-//     this.registerCreated(grr);
-//     await invokeCommandHandler(this.config,
-//         {
-//             name: "tryToUpgradeSpringBoot",
-//             parameters: {
-//                 "target.repo": this.focusRepo.repo,
-//                 "desiredBootVersion": version,
-//             },
-//         });
-//     logger.info("Handler returned. Waiting for GitHub...");
-// });
-
-// TODO get the latest branch
+When(/try to upgrade Spring Boot to (.*)/, {timeout: 45 * 1000},async function (version) {
+    logger.info("Upgrading Spring boot to %s on %s...", version, this.focusRepo.repo);
+    await invokeCommandHandler(this.config,
+        editOneInvocation(
+            "boot-upgrade",
+            this.focusRepo,
+            {
+                desiredBootVersion: version,
+            }));
+    logger.info("Handler returned. Waiting for GitHub...");
+});
