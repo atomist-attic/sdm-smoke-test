@@ -20,32 +20,26 @@ import { When } from "cucumber";
 import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { SmokeTestWorld } from "../support/world";
 
-When(/we create a new Spring Boot Project named (.*)/, {timeout: 45 * 1000}, async function (repo) {
+When("we create a new Node project", {timeout: 45 * 1000}, async function () {
+    const repo = "node-" + new Date().getTime();
     await createRepo(this as SmokeTestWorld, repo);
 });
 
-When("we create a new Spring Boot Project", {timeout: 45 * 1000}, async function () {
-    const repo = "spring-boot-" + new Date().getTime();
-    await createRepo(this as SmokeTestWorld, repo);
-});
 
-When("we create a new Java library project", {timeout: 45 * 1000}, async function () {
-    const repo = "java-lib-" + new Date().getTime();
-    await createRepo(this as SmokeTestWorld, repo, "java-hello-world-maven");
-});
-
-async function createRepo(world: SmokeTestWorld, repo: string,
-                          seedRepo: string = "spring-rest-seed") {
+async function createRepo(world: SmokeTestWorld, repo: string) {
     world.focusRepo = GitHubRepoRef.from({owner: world.config.githubOrg, repo});
     logger.info("Creating project named %s...", repo);
     world.registerCreated(world.focusRepo);
     await invokeCommandHandler(world.config,
         {
-            name: "springBootGenerator-spring-rest-seed",
+            name: "nodeGenerator-minimal-node-seed",
             parameters: {
                 "target.repo": repo,
-                "rootPackage": "com.atomist",
-                "seed": seedRepo,
+                "appName": "Test",
+                // "seed": seedRepo,
+            },
+            mappedParameters: {
+                screenName: "rod",
             },
         });
     logger.info("Handler returned. Waiting for GitHub...");
