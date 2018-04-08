@@ -40,8 +40,8 @@ export async function doWithOptions<T>(what: () => Promise<T>,
     const withRetryIfNeeded: () => Promise<T> = !!opts && !!opts.retries ?
         () => doWithRetry(what, description, opts) :
         what;
-    logger.info("doWithOptions: %s - %j", description, opts);
-    logger.info("Code: %s", withRetryIfNeeded.toString());
+    logger.debug("doWithOptions: %s - %j", description, opts);
+    logger.debug("Code: %s", withRetryIfNeeded.toString());
     if (!!opts && !!opts.delayForMillis) {
         await wait(opts.delayForMillis);
     }
@@ -61,8 +61,8 @@ const DefaultRetryOptions: RetryOptions = {
     randomize: true,
 };
 
-function doWithRetry<R>(what: () => Promise<R>, description: string,
-                        opts: Partial<RetryOptions> = {}): Promise<R> {
+export function doWithRetry<R>(what: () => Promise<R>, description: string,
+                               opts: Partial<RetryOptions> = {}): Promise<R> {
     const retryOptions: RetryOptions = {
         ...DefaultRetryOptions,
         ...opts,

@@ -34,7 +34,6 @@ import {
 import { GitCommandGitProject } from "@atomist/automation-client/project/git/GitCommandGitProject";
 import Commit = RepoBranchTips.Commit;
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
-import { doWithRetry } from "@atomist/automation-client/util/retry";
 import { AssertOptions } from "../AssertOptions";
 import { doWithOptions, FatalError } from "../util/retry";
 
@@ -92,10 +91,11 @@ export class GitHubRemoteHelper implements GitRemoteHelper {
         const saferStatus = inputStatus; // ensureValidUrl(inputStatus);
         const url = `${rr.apiBase}/repos/${rr.owner}/${rr.repo}/statuses/${sha}`;
         logger.info("Updating github status: %s to %j", url, saferStatus);
-        return doWithRetry(() => axios.post(url, saferStatus, this.authHeaders)
-            .catch(err =>
-                Promise.reject(new Error(`Error hitting ${url} to set status ${JSON.stringify(saferStatus)}: ${err.message}`)),
-            ), `Updating github status: ${url} to ${JSON.stringify(saferStatus)}`, {});
+        return doWithOptions(
+            () => axios.post(url, saferStatus, this.authHeaders)
+                .catch(err =>
+                    Promise.reject(new Error(`Error hitting ${url} to set status ${JSON.stringify(saferStatus)}: ${err.message}`)),
+                ), `Updating github status: ${url} to ${JSON.stringify(saferStatus)}`, {});
     }
 
     public async waitForStatusOf(id: RemoteRepoRef,
@@ -106,6 +106,7 @@ export class GitHubRemoteHelper implements GitRemoteHelper {
                 logger.debug(`Looking for status satisfying [${test}] on commit ${id.sha}; options=${JSON.stringify(opts)}...`);
                 const statuses = await this.statuses(id);
                 const it = statuses.find(s => test(s));
+                logger.info(`Looking for status satisfying [${test}] on commit ${id.sha}: Found ` + statusesString(statuses));
                 if (!it) {
                     throw new Error(`Not there: Status satisfying [${test}] required on commit ${id.sha}: Found ` + statusesString(statuses));
                 }
@@ -172,7 +173,7 @@ export class GitHubRemoteHelper implements GitRemoteHelper {
         const url = `${grr.apiBase}/repos/${grr.owner}/${grr.repo}/pulls/${pr.number}/merge`;
         const data = {
             commit_title: `Merge PR [${pr.number}]`,
-            commit_message:  `Merge PR [${pr.number}]`,
+            commit_message: `Merge PR [${pr.number}]`,
             sha: pr.head.sha,
             merge_method: "merge",
         };
