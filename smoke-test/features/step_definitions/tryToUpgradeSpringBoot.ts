@@ -24,7 +24,7 @@ import { editOneInvocation, invokeCommandHandler } from "../../../src/framework/
  * Definitions to handle Spring Boot version upgrade
  */
 
-When(/try to upgrade Spring Boot to (.*)/, {timeout: 45 * 1000},async function (version) {
+When(/try to upgrade Spring Boot to (.*)/, {timeout: 45 * 1000}, async function(version) {
     logger.info("Upgrading Spring boot to %s on %s...", version, this.focusRepo.repo);
     await invokeCommandHandler(this.config,
         editOneInvocation(
