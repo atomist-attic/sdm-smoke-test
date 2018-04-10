@@ -63,7 +63,7 @@ Then("it should deploy locally", {timeout: 60 * 1000}, async function() {
         false);
 });
 
-Then("it should deploy to staging", {timeout: 60 * 1000}, async function() {
+Then("it should deploy to staging", {timeout: 80 * 1000}, async function() {
     await verifySdmDeploySuccess(this.gitRemoteHelper,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha},
         ds => ds.context.includes("4-endpoint"),
@@ -71,13 +71,13 @@ Then("it should deploy to staging", {timeout: 60 * 1000}, async function() {
         true);
 });
 
-Then("it should deploy to production", {timeout: 420 * 1000}, async function() {
+Then("it should deploy to production", {timeout: 600 * 1000}, async function() {
     await verifySdmDeploySuccess(this.gitRemoteHelper,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha},
         ds => ds.context.includes("prod-deploy"),
         ep => ep.description.includes("service endpoint in Prod"),
         false,
-        allow(seconds(300)).withRetries(100));
+        allow(seconds(600)).withRetries(100));
 });
 
 Then("it should be immaterial", {timeout: 20 * 1000}, async function() {
