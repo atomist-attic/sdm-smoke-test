@@ -16,11 +16,13 @@
 
 import { After } from "cucumber";
 import { SmokeTestWorld } from "./world";
+import { waitSeconds } from "../../../src/framework/assertion/util/wait";
 
 /**
  * Cleanup repositories created
  */
 After(async function(testCase) {
     const world: SmokeTestWorld = this as SmokeTestWorld;
+    await waitSeconds(parseInt(process.env.CLEANUP_DELAY, 10) || 0);
     return world.cleanup();
 });

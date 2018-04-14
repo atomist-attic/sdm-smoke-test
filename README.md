@@ -18,3 +18,13 @@ These tests use Cucumber.js.
 
 ## Asssumptions
 - No other processes are working on the repositories that these smoke tests work with
+
+## Running one test
+
+- `TEST` (required): Name of the feature file (without `.feature`) to run
+- `CLEANUP_DELAY` (optional): Number of seconds to wait before cleaning up. Useful to allow manual
+inspection of temporary repos.
+
+```
+TEST=nodeBuild CLEANUP_DELAY=45 npm run smoke-test:one
+```
