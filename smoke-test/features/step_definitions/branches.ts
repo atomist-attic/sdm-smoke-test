@@ -38,7 +38,7 @@ Then(/should have pull request with title containing '(.*)'/, {timeout: 80 * 100
 });
 
 Then(/merge pull request with title containing '(.*)'/, {timeout: 80 * 1000}, async function(titleContent: string) {
-    const prWeWant = requiredPrWithTitleContaining(this as SmokeTestWorld, titleContent);
+    const prWeWant = await requiredPrWithTitleContaining(this as SmokeTestWorld, titleContent);
     await this.gitRemoteHelper.mergePullRequest(this.focusRepo, prWeWant);
 });
 
