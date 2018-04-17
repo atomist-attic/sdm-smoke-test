@@ -47,6 +47,9 @@ async function createRepo(world: SmokeTestWorld, repo: string,
                 "rootPackage": "com.atomist",
                 "seed": seedRepo,
             },
+            mappedParameters: {
+                screenName: "rod",
+            },
         });
     logger.info("Handler returned. Waiting for GitHub...");
 }
