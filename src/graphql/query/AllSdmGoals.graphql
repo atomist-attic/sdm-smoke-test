@@ -1,0 +1,5 @@
+query AllSdmGoals($sha: [String!]) {
+    SdmGoal(sha: $sha) {
+        ...SdmGoalFields
+    }
+}

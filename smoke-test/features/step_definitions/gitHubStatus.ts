@@ -19,15 +19,19 @@ import { Then } from "cucumber";
 
 import * as assert from "power-assert";
 import { allow, seconds } from "../../../src/framework/assertion/AssertOptions";
-import { Status } from "../../../src/framework/assertion/github/GitHubRemoteHelper";
+import { GitHubRemoteHelper, State, Status } from "../../../src/framework/assertion/github/GitHubRemoteHelper";
 import {
     ApprovalSuffix,
     verifyCodeReactionState,
     verifyImmaterial,
     verifyReviewState,
-    verifySdmBuildState,
     verifySdmDeploySuccess,
 } from "../../../src/framework/assertion/github/statusUtils";
+import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import { SdmGoalState, waitForGoalOf } from "../../../src/framework/assertion/goal/goalUtils";
+import { SmokeTestWorld } from "../support/world";
+import { AllSdmGoals } from "../../../src/typings/types";
+import SdmGoal = AllSdmGoals.SdmGoal;
 
 // Note: We cannot use arrow functions as binding doesn't work
 
@@ -36,11 +40,11 @@ import {
  */
 
 Then("build should succeed", {timeout: 240 * 1000}, async function() {
-    await verifySdmBuildState(this.gitRemoteHelper, this.focusRepo, "success");
+    await verifySdmBuildGoalState(this as SmokeTestWorld, this.focusRepo, "success");
 });
 
 Then("build should fail", {timeout: 240 * 1000}, async function() {
-    await verifySdmBuildState(this.gitRemoteHelper, this.focusRepo, "failure");
+    await verifySdmBuildGoalState(this as SmokeTestWorld, this.focusRepo, "failure");
 });
 
 Then("reactions should succeed", {timeout: 60 * 1000}, async function() {
@@ -100,3 +104,17 @@ Then(/approve gate (.*)/, {timeout: 40 * 1000}, async function(name) {
     };
     await this.gitRemoteHelper.updateStatus(this.focusRepo, approvedStatus);
 });
+
+export async function verifySdmBuildGoalState(world: SmokeTestWorld,
+                                              repo: { owner: string, repo: string, sha: string },
+                                              state: SdmGoalState): Promise<SdmGoal> {
+    const buildStatus = waitForGoalOf(
+        world,
+        repo.sha,
+        s => s.name.includes("build") && s.state === state,
+        "success",
+        allow(seconds(80)).withRetries(15),
+    );
+    logger.info("Found build success status");
+    return buildStatus;
+}
