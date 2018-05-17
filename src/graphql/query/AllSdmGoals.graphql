@@ -1,5 +1,5 @@
 query AllSdmGoals($sha: [String!]) {
-    SdmGoal(sha: $sha) {
+    SdmGoal(sha: $sha, _first: 200) {
         uniqueName
         environment
         name

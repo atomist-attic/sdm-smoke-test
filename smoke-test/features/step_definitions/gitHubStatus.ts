@@ -23,7 +23,7 @@ import { GitHubRemoteHelper, State, Status } from "../../../src/framework/assert
 import {
     ApprovalSuffix,
     verifyCodeReactionState,
-    verifyImmaterial,
+    verifyImmaterial, verifyLocalDeploySuccess,
     verifyReviewState,
     verifySdmDeploySuccess,
 } from "../../../src/framework/assertion/github/statusUtils";
@@ -48,44 +48,40 @@ Then("build should fail", {timeout: 240 * 1000}, async function() {
 });
 
 Then("reactions should succeed", {timeout: 60 * 1000}, async function() {
-    await verifyCodeReactionState(this.gitRemoteHelper,
+    await verifyCodeReactionState(this as SmokeTestWorld,
         this.focusRepo,
         "success");
 });
 
 Then("reviews should succeed", {timeout: 60 * 1000}, async function() {
-    await verifyReviewState(this.gitRemoteHelper,
+    await verifyReviewState(this as SmokeTestWorld,
         this.focusRepo,
         "success");
 });
 
 Then("it should deploy locally", {timeout: 60 * 1000}, async function() {
-    await verifySdmDeploySuccess(this.gitRemoteHelper,
-        {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha},
-        ds => ds.context.includes("deploy-local"),
-        ep => ep.context.includes("2-endpoint"),
-        false);
+    await verifyLocalDeploySuccess(this as SmokeTestWorld,
+        {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha});
 });
 
-Then("it should deploy to staging", {timeout: 80 * 1000}, async function() {
-    await verifySdmDeploySuccess(this.gitRemoteHelper,
+Then("it should deploy to staging", {timeout: 600 * 1000}, async function() {
+    await verifySdmDeploySuccess(this as SmokeTestWorld,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha},
-        ds => ds.context.includes("4-endpoint"),
-        ep => ep.context.includes("5-verifyEndpoint"),
-        true);
+        "Test",
+        true,
+        allow(seconds(600)).withRetries(100));
 });
 
 Then("it should deploy to production", {timeout: 600 * 1000}, async function() {
-    await verifySdmDeploySuccess(this.gitRemoteHelper,
+    await verifySdmDeploySuccess(this as SmokeTestWorld,
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha},
-        ds => ds.context.includes("prod-deploy"),
-        ep => ep.description.includes("service endpoint in Prod"),
+        "Prod",
         false,
         allow(seconds(600)).withRetries(100));
 });
 
 Then("it should be immaterial", {timeout: 20 * 1000}, async function() {
-    const immaterialStatus = await verifyImmaterial(this.gitRemoteHelper, this.focusRepo);
+    const immaterialStatus = await verifyImmaterial(this as SmokeTestWorld, this.focusRepo);
     logger.info("Found required immaterial status %j", immaterialStatus);
 });
 
@@ -113,7 +109,7 @@ export async function verifySdmBuildGoalState(world: SmokeTestWorld,
         repo.sha,
         s => s.name.includes("build") && s.state === state,
         "success",
-        allow(seconds(80)).withRetries(15),
+        allow(seconds(160)).withRetries(30),
     );
     logger.info("Found build success status");
     return buildStatus;

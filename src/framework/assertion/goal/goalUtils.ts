@@ -26,27 +26,28 @@ export async function waitForGoalOf(world: SmokeTestWorld,
                     sha: [sha],
                 });
             const goals: AllSdmGoals.SdmGoal[] = result.SdmGoal;
-            const it = goals.find(test);
-            logger.info(`Looking for goal satisfying [${test}] on commit ${sha}: Found ` + goalsString(goals));
-            if (!it) {
-                throw new Error(`Not there: Goal state satisfying [${test}] required on commit ${sha}: Found ` + goalsString(goals));
+            const testedGoals = goals.filter(test);
+            logger.info(`Looking for goal satisfying [${test}] with state '${state}' on commit ${sha}.`);
+            const foundGoal = testedGoals.find(g => g.state === state);
+            if (foundGoal) {
+                return foundGoal;
             }
-            if (it.state === "failure" && state !== "failure") {
-                throw new FatalError(`Failed state: Status satisfying [${test}] required on commit ${sha}: Found ` + goalsString(goals));
+            if (testedGoals.find(g => g.state === "failure")) {
+                const msg = `Failed state: Status satisfying [${test}] required on commit ${sha}.`;
+                logger.error(msg + `\n Found ${goalsString(goals)}`);
+                throw new FatalError(msg + goalsString(goals));
             }
-            if (it.state !== state) {
-                throw new Error(`Keeping looking: Status satisfying [${test}] required on commit ${sha}: Found ` + goalsString(goals));
-            }
-            return it;
+            const msg = `Keep looking for Goal satisfying [${test}] required on commit ${sha}.`;
+            logger.error(msg + `\n Found ${goalsString(goals)}`);
+            throw new Error(msg + goalsString(goals));
         }, `Waiting for status satisfying [${test}] and state [${state}] on commit ${sha}`,
         opts);
 }
 
 function goalsString(goals: SdmGoal[]) {
-    return `${goals.length} goals: \n${goals.map(goalString).join("\n\t")}`;
+    return `${goals.length} goals: \n\t${goals.map(goalString).join("\n\t")}`;
 }
 
 export function goalString(s: SdmGoal) {
-    //return `context='${s.context}';state='${s.state}';target_url=${s.target_url};description='${s.description}'`;
-    return JSON.stringify(s);
+    return `${s.name} - ${s.state} : ${s.url}`;
 }

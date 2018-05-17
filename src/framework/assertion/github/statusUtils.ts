@@ -21,101 +21,129 @@ import { verifyGet } from "../util/endpoint";
 import { GitHubRemoteHelper, State, Status, statusString } from "./GitHubRemoteHelper";
 
 import * as assert from "power-assert";
+import {SmokeTestWorld} from "../../../../smoke-test/features/support/world";
+import {goalString, SdmGoalState, waitForGoalOf} from "../goal/goalUtils";
+import {AllSdmGoals} from "../../../typings/types";
+import SdmGoal = AllSdmGoals.SdmGoal;
 
 export const ApprovalSuffix = "atomist:approve=true";
 
-export async function verifyImmaterial(gitRemoteHelper: GitHubRemoteHelper,
-                                       repo: { owner: string, repo: string, sha: string }): Promise<Status> {
-    const codeReactionStatus = await gitRemoteHelper.waitForStatusOf(
-        new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
-        s => s.context.includes("immaterial"),
+export async function verifyImmaterial(world: SmokeTestWorld,
+                                       repo: { owner: string, repo: string, sha: string }): Promise<SdmGoal> {
+    const goal = await waitForGoalOf(
+        world,
+        repo.sha,
+        s => s.name.includes("immaterial"),
         "success",
         allow(seconds(15)).withRetries(3),
     );
-    logger.info("Found code reaction success status");
-    return codeReactionStatus;
+    logger.info("Found immaterial success status");
+    return goal;
 }
 
-export async function verifyCodeReactionState(gitRemoteHelper: GitHubRemoteHelper,
+export async function verifyCodeReactionState(world: SmokeTestWorld,
                                               repo: { owner: string, repo: string, sha: string },
-                                              state: State): Promise<Status> {
-    const codeReactionStatus = await gitRemoteHelper.waitForStatusOf(
-        new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
-        s => s.context.includes("react"),
+                                              state: SdmGoalState): Promise<SdmGoal> {
+    const goal = await waitForGoalOf(
+        world,
+        repo.sha,
+        s => s.name.includes("react"),
         state,
-        allow(seconds(20)).withRetries(10),
+        allow(seconds(40)).withRetries(20),
     );
-    logger.info("Found code reaction success status");
-    return codeReactionStatus;
+    logger.info(`Found code reaction with state = ${state}`);
+    return goal;
 }
 
-export async function verifyReviewState(gitRemoteHelper: GitHubRemoteHelper,
+export async function verifyReviewState(world: SmokeTestWorld,
                                         repo: { owner: string, repo: string, sha: string },
-                                        state: State): Promise<Status> {
-    const reviewStatus = await gitRemoteHelper.waitForStatusOf(
-        new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
-        s => s.context.includes("review"),
+                                        state: SdmGoalState): Promise<SdmGoal> {
+    const goal = await waitForGoalOf(
+        world,
+        repo.sha,
+        s => s.name.includes("review"),
         state,
-        allow(seconds(20)).withRetries(10),
+        allow(seconds(40)).withRetries(20),
     );
-    logger.info("Found code review success status");
-    return reviewStatus;
+    logger.info(`Found code review with state = ${state}`);
+    return goal;
 }
 
-export async function verifySdmBuildState(gitRemoteHelper: GitHubRemoteHelper,
-                                          repo: { owner: string, repo: string, sha: string },
-                                          state: State): Promise<Status> {
-    const buildStatus = await gitRemoteHelper.waitForStatusOf(
-        new GitHubRepoRef(repo.owner, repo.repo, repo.sha),
-        s => s.context.includes("build"),
-        state,
-        allow(seconds(80)).withRetries(15),
-    );
-    logger.info("Found build success status");
-    return buildStatus;
+export interface DeploymentGoals {
+    deployGoal: SdmGoal;
+    locateGoal: SdmGoal;
+    verifyGoal: SdmGoal;
 }
 
-export interface DeploymentStatuses {
-    deployStatus: Status;
-    endpointStatus: Status;
-}
-
-export async function verifySdmDeploySuccess(gitRemoteHelper: GitHubRemoteHelper,
+export async function verifySdmDeploySuccess(world: SmokeTestWorld,
                                              repo: { owner: string, repo: string, sha: string },
-                                             deployStatusTest: (s: Status) => boolean,
-                                             endpointStatusTest: (s: Status) => boolean,
+                                             env: string,
                                              askForApproval: boolean,
-                                             deployOptions?: AssertOptions): Promise<DeploymentStatuses> {
-    const grr = new GitHubRepoRef(repo.owner, repo.repo, repo.sha);
-    const deployStatus = await gitRemoteHelper.waitForStatusOf(
-        grr,
-        deployStatusTest,
+                                             deployOptions?: AssertOptions): Promise<DeploymentGoals> {
+    const deployGoal = await waitForGoalOf(
+        world,
+        repo.sha,
+        ds => ds.name.includes(`deploy to ${env}`),
         "success",
         deployOptions || allow(seconds(80)).withRetries(15),
     );
-    logger.info("Found deploy success status");
+    logger.info("Found deploy success goal");
 
-    const endpointStatus = await gitRemoteHelper.waitForStatusOf(
-        grr,
-        endpointStatusTest,
+    const locateGoal = await waitForGoalOf(
+        world,
+        repo.sha,
+        ep => ep.name.includes(`locate service endpoint in ${env}`),
         "success",
         allow(seconds(30)).withRetries(5),
     );
-    logger.info("Found endpoint success status");
+    logger.info("Found locate success goal");
 
-    assert(!!endpointStatus.target_url, "Target URL should be set on endpoint");
-    if (askForApproval) {
-        assert(endpointStatus.target_url.endsWith(ApprovalSuffix),
-            `Endpoint status ${statusString(endpointStatus)} should seek approval`);
-    } else {
-        assert(!endpointStatus.target_url.includes("atomist:approve=true"),
-            `Endpoint status ${statusString(endpointStatus)} should not seek approval`);
-    }
+    const verifyGoal = await waitForGoalOf(
+        world,
+        repo.sha,
+        ep => ep.name.includes(`verify ${env} deployment`),
+        askForApproval ? "waiting_for_approval" : "success",
+        allow(seconds(30)).withRetries(5),
+    );
+    logger.info("Found verify success goal");
+
+    assert(!!locateGoal.url, "URL should be set on endpoint");
     try {
-        await verifyGet(endpointStatus.target_url);
-        logger.info("Verified endpoint at " + endpointStatus.target_url);
-        return {deployStatus, endpointStatus};
+        await verifyGet(locateGoal.url);
+        logger.info("Verified endpoint at " + locateGoal.url);
+        return {deployGoal, locateGoal, verifyGoal};
     } catch (err) {
-        throw new Error(`Failed to verify reported deployment of ${JSON.stringify(repo)} at ${endpointStatus.target_url}: ${err.messageClient}`);
+        throw new Error(`Failed to verify reported deployment of ${JSON.stringify(repo)} at ${locateGoal.url}: ${err.messageClient}`);
+    }
+}
+
+export async function verifyLocalDeploySuccess(world: SmokeTestWorld,
+                                             repo: { owner: string, repo: string, sha: string },
+                                             deployOptions?: AssertOptions): Promise<DeploymentGoals> {
+    const deployGoal = await waitForGoalOf(
+        world,
+        repo.sha,
+        ds => ds.name.includes(`deploy-locally`),
+        "success",
+        deployOptions || allow(seconds(80)).withRetries(15),
+    );
+    logger.info("Found deploy success goal");
+
+    const locateGoal = await waitForGoalOf(
+        world,
+        repo.sha,
+        ep => ep.name.includes(`locate local service endpoint`),
+        "success",
+        allow(seconds(30)).withRetries(5),
+    );
+    logger.info("Found locate success goal");
+
+    assert(!!locateGoal.url, "URL should be set on endpoint");
+    try {
+        await verifyGet(locateGoal.url);
+        logger.info("Verified endpoint at " + locateGoal.url);
+        return {deployGoal, locateGoal, verifyGoal: undefined};
+    } catch (err) {
+        throw new Error(`Failed to verify reported deployment of ${JSON.stringify(repo)} at ${locateGoal.url}: ${err.messageClient}`);
     }
 }

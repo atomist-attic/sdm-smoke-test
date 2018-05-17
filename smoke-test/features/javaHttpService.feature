@@ -17,18 +17,18 @@ Feature: Java HTTP service support
   Scenario: Java change on master
     Given existing github.com project losgatos1
     When Java is changed on master
-    Then build should succeed
     Then reviews should succeed
     Then reactions should succeed
+    Then build should succeed
     Then it should deploy to staging
 
     @staging @production
   Scenario: Java change on master
     Given existing github.com project losgatos1
     When Java is changed on master
-    Then build should succeed
     Then reviews should succeed
     Then reactions should succeed
+    Then build should succeed
     Then it should deploy to staging
     Then approve gate endpoint
     Then it should deploy to production
