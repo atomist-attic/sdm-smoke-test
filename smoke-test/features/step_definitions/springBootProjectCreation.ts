@@ -51,5 +51,9 @@ async function createRepo(world: SmokeTestWorld, repo: string,
                 screenName: "rod",
             },
         });
+    world.focusRepo.branch = "master";
+    const lastCommit = await world.gitRemoteHelper.lastCommit(world.focusRepo);
+    world.focusRepo.sha = lastCommit.sha;
+    world.registerCreated(world.focusRepo);
     logger.info("Handler returned. Waiting for GitHub...");
 }

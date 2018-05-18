@@ -21,10 +21,6 @@ import { editOneInvocation, invokeCommandHandler } from "../../../src/framework/
 import { SmokeTestWorld } from "../support/world";
 
 When(/run editor (.*) with no parameters/, {timeout: 80 * 1000}, async function(name: string) {
-    await doEdit(this as SmokeTestWorld, name, {}, false);
-});
-
-When(/run editor (.*) with no parameters and change focus/, {timeout: 80 * 1000}, async function(name: string) {
     await doEdit(this as SmokeTestWorld, name, {}, true);
 });
 
@@ -55,6 +51,7 @@ async function doEdit(world: SmokeTestWorld, name: string, params: any, changeFo
 
     if (changeFocus) {
         assert(!!world.gitRemoteHelper, "Remote helper must be set");
+        world.focusRepo.sha = "master";
         const currentProject = await world.gitRemoteHelper.clone(world.focusRepo, {delayForMillis: 1000, retries: 5});
         const gitStatus = await currentProject.gitStatus();
         world.focusRepo.sha = gitStatus.sha;

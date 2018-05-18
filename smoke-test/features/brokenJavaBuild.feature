@@ -6,14 +6,14 @@ Feature: Java build breakage support
   Scenario: Create a new Java library project
     When we create a new Java library project
     Then project should exist
-    And project should have java topic
+#    And project should have java topic
     And reviews should succeed
     And build should succeed
 
   Scenario: Create a new Java library project and break build
     When we create a new Java library project
     Then project should exist
-    And project should have java topic
+#    And project should have java topic
     And reviews should succeed
     And build should succeed
     Then run editor breakJavaBuild with no parameters

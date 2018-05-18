@@ -108,7 +108,7 @@ export async function verifySdmBuildGoalState(world: SmokeTestWorld,
         world,
         repo.sha,
         s => s.name.includes("build") && s.state === state,
-        "success",
+        state,
         allow(seconds(160)).withRetries(30),
     );
     logger.info("Found build success status");

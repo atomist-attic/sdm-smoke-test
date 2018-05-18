@@ -49,5 +49,5 @@ function goalsString(goals: SdmGoal[]) {
 }
 
 export function goalString(s: SdmGoal) {
-    return `${s.name} - ${s.state} : ${s.url}`;
+    return `${s.name} - ${s.environment} : ${s.state} (${s.url})`;
 }
