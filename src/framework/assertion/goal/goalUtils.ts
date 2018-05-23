@@ -45,7 +45,7 @@ export async function waitForGoalOf(world: SmokeTestWorld,
 }
 
 function goalsString(goals: SdmGoal[]) {
-    return `${goals.length} goals: \n\t${goals.map(goalString).join("\n\t")}`;
+    return `\n${goals.length} goals: \n\t${goals.map(goalString).join("\n\t")}`;
 }
 
 export function goalString(s: SdmGoal) {

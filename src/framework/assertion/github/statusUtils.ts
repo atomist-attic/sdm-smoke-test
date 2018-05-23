@@ -35,7 +35,7 @@ export async function verifyImmaterial(world: SmokeTestWorld,
         repo.sha,
         s => s.name.includes("immaterial"),
         "success",
-        allow(seconds(15)).withRetries(3),
+        allow(seconds(30)).withRetries(6),
     );
     logger.info("Found immaterial success status");
     return goal;
