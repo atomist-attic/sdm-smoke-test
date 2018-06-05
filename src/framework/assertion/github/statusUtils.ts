@@ -63,7 +63,7 @@ export async function verifyReviewState(world: SmokeTestWorld,
         repo.sha,
         s => s.name.includes("review"),
         state,
-        allow(seconds(40)).withRetries(20),
+        allow(seconds(80)).withRetries(20),
     );
     logger.info(`Found code review with state = ${state}`);
     return goal;

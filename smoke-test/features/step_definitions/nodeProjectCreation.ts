@@ -20,7 +20,7 @@ import { When } from "cucumber";
 import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { SmokeTestWorld } from "../support/world";
 
-When("we create a new Node project", {timeout: 45 * 1000}, async function() {
+When("we create a new Node project", {timeout: 80 * 1000}, async function() {
     const repo = "node-" + new Date().getTime();
     await createRepo(this as SmokeTestWorld, repo);
 });
@@ -31,7 +31,7 @@ async function createRepo(world: SmokeTestWorld, repo: string) {
     world.registerCreated(world.focusRepo);
     await invokeCommandHandler(world.config,
         {
-            name: "nodeGenerator-minimal-node-seed",
+            name: "nodeGenerator-buildable-node-seed",
             parameters: {
                 "target.repo": repo,
                 "appName": "Test",
