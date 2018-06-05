@@ -119,7 +119,7 @@ export async function verifySdmDeploySuccess(world: SmokeTestWorld,
 
 export async function verifyLocalDeploySuccess(world: SmokeTestWorld,
                                              repo: { owner: string, repo: string, sha: string },
-                                             deployOptions?: AssertOptions): Promise<DeploymentGoals> {
+                                             deployOptions?: AssertOptions): Promise<SdmGoal> {
     const deployGoal = await waitForGoalOf(
         world,
         repo.sha,
@@ -128,22 +128,5 @@ export async function verifyLocalDeploySuccess(world: SmokeTestWorld,
         deployOptions || allow(seconds(80)).withRetries(15),
     );
     logger.info("Found deploy success goal");
-
-    const locateGoal = await waitForGoalOf(
-        world,
-        repo.sha,
-        ep => ep.name.includes(`locate local service endpoint`),
-        "success",
-        allow(seconds(30)).withRetries(5),
-    );
-    logger.info("Found locate success goal");
-
-    assert(!!locateGoal.url, "URL should be set on endpoint");
-    try {
-        await verifyGet(locateGoal.url);
-        logger.info("Verified endpoint at " + locateGoal.url);
-        return {deployGoal, locateGoal, verifyGoal: undefined};
-    } catch (err) {
-        throw new Error(`Failed to verify reported deployment of ${JSON.stringify(repo)} at ${locateGoal.url}: ${err.messageClient}`);
-    }
+    return deployGoal;
 }

@@ -11,7 +11,6 @@ Feature: Spring Boot project creation
     And project should have spring-boot topic
     And project should have java topic
     And reactions should succeed
-#    And it should deploy locally
 #     And we should see cloud foundry manifest prompt
     And run editor AddCloudFoundryManifest with no parameters
     And enable deploy
