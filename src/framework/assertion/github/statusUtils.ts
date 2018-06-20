@@ -79,7 +79,7 @@ export async function verifySdmDeploySuccess(world: SmokeTestWorld,
                                              repo: { owner: string, repo: string, sha: string },
                                              env: string,
                                              askForApproval: boolean,
-                                             deployOptions?: AssertOptions): Promise<DeploymentGoals> {
+                                             deployOptions?: AssertOptions, verifyEndpoint = true): Promise<DeploymentGoals> {
     const deployGoal = await waitForGoalOf(
         world,
         repo.sha,
@@ -97,17 +97,20 @@ export async function verifySdmDeploySuccess(world: SmokeTestWorld,
         allow(seconds(30)).withRetries(5),
     );
     logger.info("Found locate success goal");
-
-    const verifyGoal = await waitForGoalOf(
-        world,
-        repo.sha,
-        ep => ep.name.includes(`verify ${env} deployment`),
-        askForApproval ? "waiting_for_approval" : "success",
-        allow(seconds(30)).withRetries(5),
-    );
-    logger.info("Found verify success goal");
-
     assert(!!locateGoal.url, "URL should be set on endpoint");
+
+    let verifyGoal;
+    if  (verifyEndpoint) {
+        verifyGoal = await waitForGoalOf(
+            world,
+            repo.sha,
+            ep => ep.name.includes(`verify ${env} deployment`),
+            askForApproval ? "waiting_for_approval" : "success",
+            allow(seconds(30)).withRetries(5),
+        );
+        logger.info("Found verify success goal");
+    }
+
     try {
         await verifyGet(locateGoal.url);
         logger.info("Verified endpoint at " + locateGoal.url);

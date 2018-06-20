@@ -30,8 +30,8 @@ Feature: Java HTTP service support
     Then reactions should succeed
     Then build should succeed
     Then it should deploy to staging
-#    Then approve gate endpoint
-#    Then it should deploy to production
+    Then approve gate verify Test deployment
+    Then it should deploy to production
 
   Scenario: Java change on new branch
     Given existing github.com project losgatos1

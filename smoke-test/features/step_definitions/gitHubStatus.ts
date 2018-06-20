@@ -32,6 +32,7 @@ import { SdmGoalState, waitForGoalOf } from "../../../src/framework/assertion/go
 import { SmokeTestWorld } from "../support/world";
 import { AllSdmGoals } from "../../../src/typings/types";
 import SdmGoal = AllSdmGoals.SdmGoal;
+import {invokeCommandHandler} from "../../../src/framework/invocation/CommandHandlerInvocation";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
@@ -77,7 +78,8 @@ Then("it should deploy to production", {timeout: 600 * 1000}, async function() {
         {owner: this.focusRepo.owner, repo: this.focusRepo.repo, sha: this.focusRepo.sha},
         "Prod",
         false,
-        allow(seconds(600)).withRetries(100));
+        allow(seconds(600)).withRetries(100),
+        false);
 });
 
 Then("it should be immaterial", {timeout: 20 * 1000}, async function() {
@@ -89,16 +91,22 @@ Then("it should be immaterial", {timeout: 20 * 1000}, async function() {
 Then(/approve gate (.*)/, {timeout: 40 * 1000}, async function(name) {
     // really should be pushing the button on the card.
     logger.info("About to set approval gate on %j", this.focusRepo);
-    const forApprovalStatus = await this.gitRemoteHelper.requiredStatus(this.focusRepo,
-        s => !!s && s.context.toLowerCase().includes(name.toLowerCase()) && !!s.target_url && s.target_url.includes(ApprovalSuffix));
-    logger.info("Updating approval state %j to approved and proceed", forApprovalStatus);
-    const approvedStatus: Status = {
-        state: forApprovalStatus.state,
-        context: forApprovalStatus.context,
-        description: forApprovalStatus.description + " | approved by smoke tests",
-        target_url: forApprovalStatus.target_url.replace(ApprovalSuffix, "").replace("?", ""),
-    };
-    await this.gitRemoteHelper.updateStatus(this.focusRepo, approvedStatus);
+    const goal = await waitForGoalOf(
+        this as SmokeTestWorld,
+        this.focusRepo.sha,
+        s => s.name.includes(name),
+        "waiting_for_approval",
+        allow(seconds(60)).withRetries(6),
+    );
+    await invokeCommandHandler(this.config, {
+        name: "UpdateSdmGoalState",
+        parameters: {
+            "id": goal.id,
+            "state": "success",
+        },
+        mappedParameters: {},
+        secrets: [],
+    });
 });
 
 export async function verifySdmBuildGoalState(world: SmokeTestWorld,

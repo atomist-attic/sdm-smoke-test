@@ -19,5 +19,5 @@ Feature: Spring Boot project creation
     And reviews should succeed
     And reactions should succeed
     And it should deploy to staging
-#    And approve gate endpoint
-#    And it should deploy to production
+    And approve gate verify Test deployment
+    And it should deploy to production
