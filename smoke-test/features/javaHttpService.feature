@@ -13,15 +13,6 @@ Feature: Java HTTP service support
 #    When README is changed on a new branch
 #    Then it should be immaterial
 
-    @staging
-  Scenario: Java change on master
-    Given existing github.com project losgatos1
-    When Java is changed on master
-    Then reviews should succeed
-    Then reactions should succeed
-    Then build should succeed
-    Then it should deploy to staging
-
     @staging @production
   Scenario: Java change on master
     Given existing github.com project losgatos1

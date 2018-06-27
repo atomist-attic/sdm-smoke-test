@@ -6,7 +6,7 @@ Feature: Node build support
   Scenario: Create a new Node project and break build
     When we create a new Node project
     Then project should exist
-    And project should have node topic
+#    And project should have node topic
     And reviews should succeed
     And build should succeed
     Then run editor breakNodeBuild with no parameters
