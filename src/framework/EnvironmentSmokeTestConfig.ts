@@ -25,7 +25,7 @@ export const EnvironmentSmokeTestConfig: SmokeTestConfig = {
 
     atomistTeamName: process.env.ATOMIST_TEAM_NAME || "Atomist",
 
-    baseEndpoint: "http://localhost:2866",
+    baseEndpoint: process.env.SDM_BASE_ENDPOINT || "http://localhost:2866",
 
     user: "admin",
     password: process.env.LOCAL_ATOMIST_ADMIN_PASSWORD || throwError("Please define LOCAL_ATOMIST_ADMIN_PASSWORD"),
