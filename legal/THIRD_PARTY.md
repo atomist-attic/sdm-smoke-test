@@ -8,24 +8,24 @@ This page details all runtime OSS dependencies of `sdm-smoke-test`.
 
 | License | Count |
 |---------|-------|
-|AFLv2.1|1|
-|Apache License, Version 2.0|2|
-|Apache-2.0|23|
-|Apache|1|
-|Artistic-2.0|4|
-|BSD-2-Clause|22|
-|BSD-3-Clause|21|
-|BSD|5|
-|CC0-1.0|2|
-|Custom: https://github.com/douglascrockford/JSON-js|1|
-|GPL-3.0|6|
-|ISC|106|
-|MIT AND CC-BY-3.0|1|
-|MIT|589|
-|Public Domain|1|
-|UNKNOWN|1|
-|Unlicense|2|
-|WTFPL|3|
+|[AFLv2.1](#aflv21)|1|
+|[Apache License, Version 2.0](#apache-license,-version-20)|2|
+|[Apache-2.0](#apache-20)|23|
+|[Apache](#apache)|1|
+|[Artistic-2.0](#artistic-20)|4|
+|[BSD-2-Clause](#bsd-2-clause)|22|
+|[BSD-3-Clause](#bsd-3-clause)|21|
+|[BSD](#bsd)|5|
+|[CC0-1.0](#cc0-10)|2|
+|[Custom: https://github.com/douglascrockford/JSON-js](#custom-httpsgithubcomdouglascrockfordjson-js)|1|
+|[GPL-3.0](#gpl-30)|6|
+|[ISC](#isc)|106|
+|[MIT AND CC-BY-3.0](#mit-and-cc-by-30)|1|
+|[MIT](#mit)|589|
+|[Public Domain](#public-domain)|1|
+|[UNKNOWN](#unknown)|1|
+|[Unlicense](#unlicense)|2|
+|[WTFPL](#wtfpl)|3|
 
 #### AFLv2.1
 
