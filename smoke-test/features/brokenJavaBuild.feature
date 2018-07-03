@@ -7,8 +7,8 @@ Feature: Java build breakage support
     When we create a new Java library project
     Then project should exist
     And project should have java topic
-    And reviews should succeed
+#    And reviews should succeed
     And build should succeed
     Then run editor breakJavaBuild with no parameters
-    Then reviews should succeed
+#    Then reviews should succeed
     And build should fail
