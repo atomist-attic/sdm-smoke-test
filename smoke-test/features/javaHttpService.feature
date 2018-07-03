@@ -17,8 +17,8 @@ Feature: Java HTTP service support
   Scenario: Java change on master
     Given existing github.com project losgatos1
     When Java is changed on master
-#    Then reviews should succeed
-#    Then reactions should succeed
+    Then reviews should succeed
+    Then reactions should succeed
     Then build should succeed
     Then it should deploy to staging
     Then approve gate verify Test deployment
@@ -27,7 +27,7 @@ Feature: Java HTTP service support
   Scenario: Java change on new branch
     Given existing github.com project losgatos1
     When Java is changed on a new branch
-#    Then reactions should succeed
+    Then reactions should succeed
     Then it should deploy locally
 
   Scenario: Concurrent branch deploys
@@ -37,8 +37,8 @@ Feature: Java HTTP service support
     When Java is changed on a new branch
     When save as b2
     Then load b1
-#    Then reactions should succeed
+    Then reactions should succeed
     Then it should deploy locally
     Then load b2
-#    Then reactions should succeed
+    Then reactions should succeed
     Then it should deploy locally
