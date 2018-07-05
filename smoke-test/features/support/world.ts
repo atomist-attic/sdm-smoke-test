@@ -49,7 +49,7 @@ export class SmokeTestWorld {
     private readonly reposCreated: RepoId[] = [];
 
     public get graphClient(): GraphClient {
-        return new ApolloGraphClient(`https://automation.atomist.com/graphql/team/${this.config.atomistTeamId}`,
+        return new ApolloGraphClient(`${this.config.graphClientEndpoint}/${this.config.atomistTeamId}`,
             { Authorization: `token ${(this.config.credentials as TokenCredentials).token}` });
     }
 

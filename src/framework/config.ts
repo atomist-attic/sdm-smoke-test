@@ -24,6 +24,8 @@ export interface SmokeTestConfig {
 
     baseEndpoint: string;
 
+    graphClientEndpoint: string;
+
     user: string;
 
     password: string;

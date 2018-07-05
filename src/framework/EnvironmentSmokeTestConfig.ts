@@ -27,6 +27,8 @@ export const EnvironmentSmokeTestConfig: SmokeTestConfig = {
 
     baseEndpoint: process.env.SDM_BASE_ENDPOINT || "http://localhost:2866",
 
+    graphClientEndpoint: process.env.GRAPH_CLIENT_ENDPOINT || "https://automation.atomist.com/graphql/team",
+
     user: "admin",
     password: process.env.LOCAL_ATOMIST_ADMIN_PASSWORD || throwError("Please define LOCAL_ATOMIST_ADMIN_PASSWORD"),
 
