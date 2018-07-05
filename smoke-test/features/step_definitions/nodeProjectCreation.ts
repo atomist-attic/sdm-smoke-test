@@ -31,7 +31,7 @@ async function createRepo(world: SmokeTestWorld, repo: string) {
     world.registerCreated(world.focusRepo);
     await invokeCommandHandler(world.config,
         {
-            name: "nodeGenerator-buildable-node-seed",
+            name: "buildable-node-generator",
             parameters: {
                 "target.repo": repo,
                 "appName": "Test",
