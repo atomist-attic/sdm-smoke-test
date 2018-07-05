@@ -7,8 +7,8 @@ Feature: Node build support
     When we create a new Node project
     Then project should exist
 #    And project should have node topic
-#    And reviews should succeed
+    And reviews should succeed
     And build should succeed
     Then run editor breakNodeBuild with no parameters
-#    Then reviews should succeed
+    Then reviews should succeed
     And build should fail
