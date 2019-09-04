@@ -16,7 +16,10 @@
 
 import { logger } from "@atomist/automation-client";
 import { When } from "cucumber";
-import { editOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
+import {
+    editOneInvocation,
+    invokeCommandHandler,
+} from "../../../src/framework/invocation/CommandHandlerInvocation";
 
 // Note: We cannot use arrow functions as binding doesn't work
 

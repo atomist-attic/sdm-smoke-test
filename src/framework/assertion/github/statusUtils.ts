@@ -16,14 +16,27 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { allow, AssertOptions, seconds } from "../AssertOptions";
+import {
+    allow,
+    AssertOptions,
+    seconds,
+} from "../AssertOptions";
 import { verifyGet } from "../util/endpoint";
-import { GitHubRemoteHelper, State, Status, statusString } from "./GitHubRemoteHelper";
+import {
+    GitHubRemoteHelper,
+    State,
+    Status,
+    statusString,
+} from "./GitHubRemoteHelper";
 
 import * as assert from "power-assert";
-import {SmokeTestWorld} from "../../../../smoke-test/features/support/world";
-import {goalString, SdmGoalState, waitForGoalOf} from "../goal/goalUtils";
-import {AllSdmGoals} from "../../../typings/types";
+import { SmokeTestWorld } from "../../../../smoke-test/features/support/world";
+import {
+    goalString,
+    SdmGoalState,
+    waitForGoalOf,
+} from "../goal/goalUtils";
+import { AllSdmGoals } from "../../../typings/types";
 import SdmGoal = AllSdmGoals.SdmGoal;
 
 export const ApprovalSuffix = "atomist:approve=true";

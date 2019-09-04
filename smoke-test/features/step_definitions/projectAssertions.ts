@@ -16,7 +16,10 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { Then, When } from "cucumber";
+import {
+    Then,
+    When,
+} from "cucumber";
 
 import * as assert from "power-assert";
 

@@ -15,9 +15,15 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { Then, When } from "cucumber";
+import {
+    Then,
+    When,
+} from "cucumber";
 import * as assert from "power-assert";
-import { editOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
+import {
+    editOneInvocation,
+    invokeCommandHandler,
+} from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { SmokeTestWorld } from "../support/world";
 
 When(/run editor (.*) with no parameters/, {timeout: 80 * 1000}, async function(name: string) {

@@ -19,7 +19,10 @@ import { RetryOptions } from "@atomist/automation-client/util/retry";
 import { AssertOptions } from "../AssertOptions";
 
 import * as promiseRetry from "promise-retry";
-import { blowUpInMillis, wait } from "./wait";
+import {
+    blowUpInMillis,
+    wait,
+} from "./wait";
 
 export class FatalError extends Error {
 

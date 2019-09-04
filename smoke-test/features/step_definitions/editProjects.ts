@@ -15,10 +15,16 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { BranchCommit, commitToMaster } from "@atomist/automation-client/operations/edit/editModes";
+import {
+    BranchCommit,
+    commitToMaster,
+} from "@atomist/automation-client/operations/edit/editModes";
 import { When } from "cucumber";
 import { edit } from "../../../src/framework/assertion/util/edit";
-import { editOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
+import {
+    editOneInvocation,
+    invokeCommandHandler,
+} from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { ApacheHeader } from "../support/headers";
 
 import * as assert from "power-assert";

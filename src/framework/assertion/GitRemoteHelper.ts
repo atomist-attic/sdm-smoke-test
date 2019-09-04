@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { RemoteRepoRef, RepoId } from "@atomist/automation-client/operations/common/RepoId";
+import {
+    RemoteRepoRef,
+    RepoId,
+} from "@atomist/automation-client/operations/common/RepoId";
 import { RepoBranchTips } from "../../typings/types";
 
 import Commit = RepoBranchTips.Commit;

@@ -23,7 +23,10 @@ import { logger } from "@atomist/automation-client";
 import { ApolloGraphClient } from "@atomist/automation-client/graph/ApolloGraphClient";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
 import { TokenCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
-import { RemoteRepoRef, RepoId } from "@atomist/automation-client/operations/common/RepoId";
+import {
+    RemoteRepoRef,
+    RepoId,
+} from "@atomist/automation-client/operations/common/RepoId";
 import { GraphClient } from "@atomist/automation-client/spi/graph/GraphClient";
 import * as assert from "power-assert";
 

@@ -15,11 +15,23 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { GitHubRepoRef, isGitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { RemoteRepoRef, RepoId } from "@atomist/automation-client/operations/common/RepoId";
+import {
+    GitHubRepoRef,
+    isGitHubRepoRef,
+} from "@atomist/automation-client/operations/common/GitHubRepoRef";
+import {
+    RemoteRepoRef,
+    RepoId,
+} from "@atomist/automation-client/operations/common/RepoId";
 import axios, { AxiosPromise, AxiosRequestConfig, AxiosResponse } from "axios";
-import { AllPullRequests, RepoBranchTips } from "../../../typings/types";
-import { Dated, GitRemoteHelper } from "../GitRemoteHelper";
+import {
+    AllPullRequests,
+    RepoBranchTips,
+} from "../../../typings/types";
+import {
+    Dated,
+    GitRemoteHelper,
+} from "../GitRemoteHelper";
 
 import * as assert from "power-assert";
 
@@ -35,7 +47,10 @@ import { GitCommandGitProject } from "@atomist/automation-client/project/git/Git
 import Commit = RepoBranchTips.Commit;
 import { GitProject } from "@atomist/automation-client/project/git/GitProject";
 import { AssertOptions } from "../AssertOptions";
-import { doWithOptions, FatalError } from "../util/retry";
+import {
+    doWithOptions,
+    FatalError,
+} from "../util/retry";
 
 export type State = "error" | "failure" | "pending" | "success";
 

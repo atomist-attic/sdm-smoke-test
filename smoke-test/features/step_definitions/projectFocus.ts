@@ -15,7 +15,11 @@
  */
 
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { Given, Then, When } from "cucumber";
+import {
+    Given,
+    Then,
+    When,
+} from "cucumber";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
