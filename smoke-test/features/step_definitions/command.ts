@@ -1,11 +1,11 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +15,15 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import { Then, When } from "cucumber";
+import {
+    Then,
+    When,
+} from "cucumber";
 import * as assert from "power-assert";
-import { editOneInvocation, invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
+import {
+    editOneInvocation,
+    invokeCommandHandler,
+} from "../../../src/framework/invocation/CommandHandlerInvocation";
 import { SmokeTestWorld } from "../support/world";
 
 When(/run editor (.*) with no parameters/, {timeout: 80 * 1000}, async function(name: string) {

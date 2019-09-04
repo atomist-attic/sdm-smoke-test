@@ -1,11 +1,11 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,14 +16,27 @@
 
 import { logger } from "@atomist/automation-client";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { allow, AssertOptions, seconds } from "../AssertOptions";
+import {
+    allow,
+    AssertOptions,
+    seconds,
+} from "../AssertOptions";
 import { verifyGet } from "../util/endpoint";
-import { GitHubRemoteHelper, State, Status, statusString } from "./GitHubRemoteHelper";
+import {
+    GitHubRemoteHelper,
+    State,
+    Status,
+    statusString,
+} from "./GitHubRemoteHelper";
 
 import * as assert from "power-assert";
-import {SmokeTestWorld} from "../../../../smoke-test/features/support/world";
-import {goalString, SdmGoalState, waitForGoalOf} from "../goal/goalUtils";
-import {AllSdmGoals} from "../../../typings/types";
+import { SmokeTestWorld } from "../../../../smoke-test/features/support/world";
+import {
+    goalString,
+    SdmGoalState,
+    waitForGoalOf,
+} from "../goal/goalUtils";
+import { AllSdmGoals } from "../../../typings/types";
 import SdmGoal = AllSdmGoals.SdmGoal;
 
 export const ApprovalSuffix = "atomist:approve=true";

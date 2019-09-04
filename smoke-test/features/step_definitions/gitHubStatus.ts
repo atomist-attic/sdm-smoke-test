@@ -1,11 +1,11 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,21 +18,32 @@ import { logger } from "@atomist/automation-client";
 import { Then } from "cucumber";
 
 import * as assert from "power-assert";
-import { allow, seconds } from "../../../src/framework/assertion/AssertOptions";
-import { GitHubRemoteHelper, State, Status } from "../../../src/framework/assertion/github/GitHubRemoteHelper";
+import {
+    allow,
+    seconds,
+} from "../../../src/framework/assertion/AssertOptions";
+import {
+    GitHubRemoteHelper,
+    State,
+    Status,
+} from "../../../src/framework/assertion/github/GitHubRemoteHelper";
 import {
     ApprovalSuffix,
     verifyCodeReactionState,
-    verifyImmaterial, verifyLocalDeploySuccess,
+    verifyImmaterial,
+    verifyLocalDeploySuccess,
     verifyReviewState,
     verifySdmDeploySuccess,
 } from "../../../src/framework/assertion/github/statusUtils";
 import { GitHubRepoRef } from "@atomist/automation-client/operations/common/GitHubRepoRef";
-import { SdmGoalState, waitForGoalOf } from "../../../src/framework/assertion/goal/goalUtils";
+import {
+    SdmGoalState,
+    waitForGoalOf,
+} from "../../../src/framework/assertion/goal/goalUtils";
 import { SmokeTestWorld } from "../support/world";
 import { AllSdmGoals } from "../../../src/typings/types";
 import SdmGoal = AllSdmGoals.SdmGoal;
-import {invokeCommandHandler} from "../../../src/framework/invocation/CommandHandlerInvocation";
+import { invokeCommandHandler } from "../../../src/framework/invocation/CommandHandlerInvocation";
 
 // Note: We cannot use arrow functions as binding doesn't work
 
