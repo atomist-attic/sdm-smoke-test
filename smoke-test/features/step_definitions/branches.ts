@@ -18,7 +18,10 @@ import { logger } from "@atomist/automation-client";
 import { Then } from "cucumber";
 import * as assert from "power-assert";
 import { waitSeconds } from "../../../src/framework/assertion/util/wait";
-import { AllPullRequests, AllPushes } from "../../../src/typings/types";
+import {
+    AllPullRequests,
+    AllPushes,
+} from "../../../src/typings/types";
 import PullRequest = AllPullRequests.PullRequest;
 import { SmokeTestWorld } from "../support/world";
 

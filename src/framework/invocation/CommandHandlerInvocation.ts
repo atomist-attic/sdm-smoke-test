@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-import { HandlerResult, logger } from "@atomist/automation-client";
-import { Arg, Secret } from "@atomist/automation-client/internal/invoker/Payload";
+import {
+    HandlerResult,
+    logger,
+} from "@atomist/automation-client";
+import {
+    Arg,
+    Secret,
+} from "@atomist/automation-client/internal/invoker/Payload";
 
 import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
 import { SmokeTestConfig } from "../config";

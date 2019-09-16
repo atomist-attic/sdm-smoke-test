@@ -15,7 +15,10 @@
  */
 
 import { AssertOptions } from "../AssertOptions";
-import { doWithOptions, FatalError } from "../util/retry";
+import {
+    doWithOptions,
+    FatalError,
+} from "../util/retry";
 import { SmokeTestWorld } from "../../../../smoke-test/features/support/world";
 import { AllSdmGoals } from "../../../typings/types";
 import { logger } from "@atomist/automation-client";
